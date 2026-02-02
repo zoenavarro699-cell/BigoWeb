@@ -42,3 +42,29 @@ a{ color:inherit; text-decoration:none; }
 .table th{ color:var(--muted); font-weight:600; font-size:12px; }
 .small{ color:var(--muted); font-size:12px; }
 .footer{ margin-top:28px; color:var(--muted); font-size:12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+/* Models: search + page size */
+.modelsHeaderRow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:10px 0 14px}
+.searchWrap{position:relative;flex:1;min-width:240px;max-width:520px}
+.searchInput{width:100%;padding:11px 42px 11px 40px;border-radius:14px;border:1px solid var(--line);background:#101013;color:var(--text);outline:none}
+.searchInput::placeholder{color:var(--muted)}
+.searchInput:focus{border-color:#3f3f46}
+.searchIcon{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.75}
+.clearBtn{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:#0f0f12;color:var(--muted);border-radius:999px;padding:4px 8px;cursor:pointer;font-size:12px;line-height:1}
+.clearBtn:hover{border-color:#3f3f46;color:var(--text)}
+
+.rightControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.select{padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#101013;color:var(--text);outline:none}
+.select:focus{border-color:#3f3f46}
+
+.countPill{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#101013;color:var(--muted)}
+
+/* Pagination */
+.pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:20px 0 4px}
+.pageBtn{border:1px solid var(--line);background:#101013;color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;font-size:12px;min-width:34px;text-align:center}
+.pageBtn:hover{border-color:#3f3f46;color:var(--text)}
+.pageBtn[disabled]{opacity:.45;cursor:not-allowed}
+.pageBtnActive{border-color:rgba(124,58,237,.65);color:var(--text);box-shadow:0 0 0 2px rgba(124,58,237,.15) inset}
+.pageDots{padding:0 6px;color:rgba(255,255,255,.35)}
+.pagingMeta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:12px}
+
