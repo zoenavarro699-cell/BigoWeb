@@ -3,7 +3,9 @@ export type ModelRow = {
   model_key: string;
   name: string | null;
   cover_url: string | null;
-  id_hash_canonical?: string | null;
+  // Column exists on every row in Supabase (may be NULL). Keep it required so
+  // ModelRow is assignable to UI types that require this field.
+  id_hash_canonical: string | null;
 };
 
 export type BatchRow = {
