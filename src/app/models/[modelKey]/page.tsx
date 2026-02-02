@@ -9,6 +9,27 @@ function Stars({ n }: { n: number | null }) {
   return <span className="pill">⭐ {v}</span>;
 }
 
+function splitIds(raw: string | null): string[] {
+  if (!raw) return [];
+  return raw
+    .split(/[\s,;|]+/g)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function buildTags(modelKey: string, idHash: string | null): string[] {
+  const base = [modelKey, ...splitIds(idHash)].map((s) => makeHashtag(s)).filter(Boolean);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const t of base) {
+    if (!seen.has(t)) {
+      seen.add(t);
+      out.push(t);
+    }
+  }
+  return out;
+}
+
 export default async function ModelPage({ params }: { params: { modelKey: string } }) {
   const modelKey = decodeURIComponent(params.modelKey);
   const model = await getModelByKey(modelKey);
@@ -24,13 +45,13 @@ export default async function ModelPage({ params }: { params: { modelKey: string
   }
 
   const batches = await listBatchesForModel(model.id);
-  const tag = makeHashtag(model.model_key);
+  const tags = buildTags(model.model_key, model.id_hash_canonical);
 
   return (
     <main>
       <div className="row" style={{justifyContent:"space-between"}}>
         <a className="btn" href="/">← Volver</a>
-        <span className="pill">{tag}</span>
+        <span className="pill">{tags[0] ?? makeHashtag(model.model_key)}</span>
       </div>
 
       <div style={{height:12}} />
@@ -39,14 +60,17 @@ export default async function ModelPage({ params }: { params: { modelKey: string
         <div style={{display:"grid", gridTemplateColumns:"280px 1fr", gap:14}}>
           <div style={{position:"relative", width:"100%", aspectRatio:"1/1", background:"#0f0f12"}}>
             {model.cover_url ? (
-              <Image src={model.cover_url} alt={model.model_key} fill style={{objectFit:"cover"}} />
+              <Image src={model.cover_url} alt={model.model_key} fill style={{objectFit:"cover", objectPosition:"50% 0%"}} />
             ) : null}
           </div>
           <div className="cardBody">
-            <div className="h1" style={{marginTop:0}}>Modelo {model.model_key}</div>
-            <div className="h2" style={{marginBottom:10}}>{model.name ? `Alias (solo web): ${model.name}` : "Alias: (sin nombre)"}</div>
-            <div className="row">
-              <span className="pill">Código: {model.model_key}</span>
+            <div className="h1" style={{marginTop:0}}>{(model.name ?? model.model_key).trim() || model.model_key}</div>
+            <div className="h2" style={{marginBottom:10}}>ID: {model.model_key}</div>
+            <div className="row" style={{flexWrap:"wrap"}}>
+              <span className="pill">Tags:</span>
+              {tags.map((t) => (
+                <span key={t} className="pill mono">{t}</span>
+              ))}
               {model.id_hash_canonical ? <span className="pill">Hash: {model.id_hash_canonical}</span> : null}
             </div>
             <div className="hr" />
