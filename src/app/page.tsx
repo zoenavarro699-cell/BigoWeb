@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import { listModels, listCollabs } from "@/lib/queries";
 import ModelsClient from "@/components/ModelsClient";
 
@@ -33,7 +34,9 @@ export default async function HomePage() {
             Modelos <span className="badge-pill">{models.length}</span>
           </div>
         </div>
-        <ModelsClient models={models} />
+        <Suspense fallback={<div style={{ padding: 40, textAlign: 'center' }}>Cargando...</div>}>
+          <ModelsClient models={models} />
+        </Suspense>
       </section>
 
       <div className="divider" />
