@@ -1,195 +1,219 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { sanitizeKeyForTag, makeHashtag } from '@/lib/tag';
 
 type ModelForGrid = {
-  id: string;
   model_key: string;
   name: string | null;
-  cover_url: string | null;
-  id_hash_canonical: string | null;
+  id_hash_canonical?: string | null;
+  cover_url?: string | null;
+  // Compat con versiones anteriores
+  tags?: string[] | null;
 };
 
-function makeHashtag(s: string) {
-  let out = (s || "").trim().toLowerCase();
-  out = out.replace(/\s+/g, "_");
-  out = out.replace(/\./g, "");
-  if (/^\d/.test(out)) out = `id${out}`;
-  // allow letters, digits, underscore only
-  out = out.replace(/[^a-z0-9_]+/g, "_");
-  out = out.replace(/_+/g, "_");
-  out = out.replace(/^_+|_+$/g, "");
+// Genera tags visuales (IDs y Alias)
+function buildTags(m: ModelForGrid): string[] {
+  const out: string[] = [];
+  const idRaw = (m.model_key || '').toString();
+  const id = sanitizeKeyForTag(idRaw);
+
+  if (id && id !== 'unknown') {
+    out.push(makeHashtag(idRaw));
+  }
+
+  const canonRaw = (m.id_hash_canonical || '').toString().trim();
+  const canon = sanitizeKeyForTag(canonRaw);
+
+  if (canon && canon !== 'unknown' && canon !== id) {
+    out.push(makeHashtag(canonRaw));
+  }
   return out;
 }
 
-function cleanDisplayName(name: string | null, fallback: string) {
-  const raw = (name ?? "").trim();
-  if (!raw) return fallback;
-  // Examples we see: "Modelo _colombianita_", "Modelo 0831AM", "MODELO - xyz"
-  let out = raw.replace(/^modelo\s*[-_:]*\s*/i, "");
-  out = out.replace(/_/g, " ");
-  out = out.replace(/\s+/g, " ").trim();
-  return out || fallback;
-}
+function displayTitle(m: ModelForGrid): string {
+  const n = (m.name || '').trim();
+  if (n) return n;
 
-function buildPagination(current: number, total: number) {
-  const delta = 2;
-  const range: number[] = [];
-  for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-      range.push(i);
-    }
-  }
-  const out: Array<number | "…"> = [];
-  let last: number | undefined;
-  for (const n of range) {
-    if (last !== undefined) {
-      if (n - last === 2) out.push(last + 1);
-      else if (n - last > 2) out.push("…");
-    }
-    out.push(n);
-    last = n;
-  }
-  return out;
+  const key = m.model_key || 'Unknown';
+  return key.charAt(0).toUpperCase() + key.slice(1);
 }
 
 export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
-  const [q, setQ] = useState("");
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL params or defaults
+  const [query, setQuery] = useState(() => searchParams.get('q') || '');
+  const [page, setPage] = useState(() => {
+    const p = parseInt(searchParams.get('page') || '1', 10);
+    return isNaN(p) || p < 1 ? 1 : p;
+  });
+  const [pageSize, setPageSize] = useState(() => {
+    const s = parseInt(searchParams.get('size') || '20', 10);
+    return [20, 40, 80].includes(s) ? s : 20;
+  });
+
+  // Sync state to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (query) params.set('q', query); else params.delete('q');
+    if (page > 1) params.set('page', page.toString()); else params.delete('page');
+    if (pageSize !== 20) params.set('size', pageSize.toString()); else params.delete('size');
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [query, page, pageSize, pathname, router, searchParams]);
 
   const filtered = useMemo(() => {
-    const qq = q.trim().toLowerCase();
-    if (!qq) return models;
+    const q = query.trim().toLowerCase();
+    if (!q) return models;
+
     return models.filter((m) => {
-      const name = cleanDisplayName(m.name, m.model_key).toLowerCase();
-      const ids = [m.model_key, m.id_hash_canonical ?? ""].join(" ").toLowerCase();
-      return name.includes(qq) || ids.includes(qq);
+      const title = displayTitle(m).toLowerCase();
+      const id = (m.model_key || '').toLowerCase();
+      const alias = (m.id_hash_canonical || '').toLowerCase();
+
+      const tags = buildTags(m).map(t => t.toLowerCase());
+      const tagMatch = tags.some(t => t.includes(q));
+
+      return (
+        title.includes(q) ||
+        id.includes(q) ||
+        alias.includes(q) ||
+        tagMatch
+      );
     });
-  }, [models, q]);
+  }, [models, query]);
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
+  // Reset page when query or pageSize changes (logic handled in useEffect above implicitly? No, need explicit reset if user types)
   useEffect(() => {
-    // When search / size changes, reset to first page.
-    setPage(1);
-  }, [q, pageSize]);
+    // If the query changes effectively, we might want to reset page to 1 if the current page is out of bounds.
+    // But strictly, if user types, usually we want page 1.
+    // Let's rely on the user manual interaction or a specific check.
+    // Actually, standard behavior: typing search = reset to page 1.
+    // But `setPage(1)` inside the same render cycle as `setQuery` is tricky if not coupled.
+    // We'll let the user handle it or add a specific effect if needed. 
+    // For now, let's just ensure if refined count < current page start, we clamp.
+    // The clamp logic is handled in the `current` slice calculation?
+    // Yes: `const startIndex = ...` uses page directly.
+    // Best practice: Set page to 1 when query changes.
+  }, []);
 
-  const pageItems = useMemo(() => {
+  // Handlers
+  const handleSortChange = (size: number) => {
+    setPageSize(size);
+    setPage(1); // Reset page on size change
+  }
+
+  const handleSearchChange = (val: string) => {
+    setQuery(val);
+    setPage(1); // Reset page on search change
+  }
+
+  const current = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filtered.slice(start, start + pageSize);
   }, [filtered, page, pageSize]);
 
-  const startIdx = filtered.length === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endIdx = Math.min(filtered.length, page * pageSize);
+  const startIndex = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const endIndex = Math.min(page * pageSize, total);
 
-  const pageButtons = useMemo(() => buildPagination(page, pageCount), [page, pageCount]);
-
-  function goToPage(p: number) {
-    const safe = Math.min(pageCount, Math.max(1, p));
-    setPage(safe);
-    // nice UX: when changing pages, go back near the top of the grid
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  // Pagination logic
+  const pageItems = useMemo(() => {
+    const items: (number | '…')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) items.push(i);
+      return items;
     }
-  }
+    items.push(1);
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+
+    if (start > 2) items.push('…');
+    for (let i = start; i <= end; i++) items.push(i);
+    if (end < totalPages - 1) items.push('…');
+    items.push(totalPages);
+
+    return items;
+  }, [page, totalPages]);
 
   return (
     <>
-      <div className="modelsHeaderRow">
-        <div className="modelsHeaderLeft">
-          <div className="searchBar">
-            <span className="searchIcon" aria-hidden>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M21 21L16.65 16.65"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            <input
-              className="searchInput"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nombre o ID…"
-              spellCheck={false}
-            />
-            {q.trim() ? (
-              <button
-                type="button"
-                className="clearBtn"
-                onClick={() => setQ("")}
-                aria-label="Limpiar búsqueda"
-                title="Limpiar"
-              >
-                ✕
-              </button>
-            ) : null}
-          </div>
-
-          <div className="pageSizeWrap">
-            <span className="mutedSm">Por página:</span>
-            <select
-              className="pageSizeSelect"
-              value={pageSize}
-              onChange={(e) => setPageSize(parseInt(e.target.value, 10))}
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={30}>30</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
+      <div className="toolbar-grid glass">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 'fit-content' }}>
+          <span className="badge-pill" style={{ background: 'var(--primary-glow)', color: 'white' }}>
+            {total} Modelos
+          </span>
+          <span className="text-muted" style={{ fontSize: 13 }}>
+            {startIndex}-{endIndex}
+          </span>
         </div>
 
-        <div className="modelsHeaderRight">
-          <div className="pill">
-            {filtered.length.toLocaleString()} / {models.length.toLocaleString()}
-          </div>
+        <div className="search-wrap" style={{ width: '100%' }}>
+          <span className="search-icon">🔍</span>
+          <input
+            className="search-input"
+            placeholder="Buscar modelo..."
+            value={query}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
         </div>
-      </div>
 
-      <div className="modelsMeta">
-        <span className="mutedSm">Mostrando {startIdx}-{endIdx} de {filtered.length.toLocaleString()}</span>
+        <div style={{ minWidth: 'fit-content' }}>
+          <select
+            className="select-input"
+            value={pageSize}
+            onChange={(e) => handleSortChange(parseInt(e.target.value, 10))}
+          >
+            <option value={20}>20 / pág</option>
+            <option value={40}>40 / pág</option>
+            <option value={80}>80 / pág</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid">
-        {pageItems.map((m) => {
-          const title = cleanDisplayName(m.name, m.model_key);
-          const tags = [`#${makeHashtag(`id_${m.model_key}`)}`];
-          if (m.id_hash_canonical) tags.push(`#${makeHashtag(m.id_hash_canonical)}`);
+        {current.map((m) => {
+          const title = displayTitle(m);
+          const tags = buildTags(m);
 
           return (
-            <a key={m.id} className="card" href={`/models/${encodeURIComponent(m.model_key)}`}>
-              <div className="thumb">
+            <a
+              key={m.model_key}
+              className="card glass"
+              href={`/models/${encodeURIComponent(m.model_key)}`}
+              onClick={() => {
+                // Optional: If we wanted to force push state before navigating, but the useEffect handles it.
+              }}
+            >
+              <div className="card-image-wrap">
                 {m.cover_url ? (
                   <img
+                    className="card-image"
                     src={m.cover_url}
                     alt={title}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }}
+                    loading="lazy"
+                    style={{ objectFit: 'cover', objectPosition: '50% 0%' }}
                   />
                 ) : (
-                  <div className="thumbPlaceholder" />
-                )}
-              </div>
-              <div className="cardBody">
-                <div className="cardTitle">{title}</div>
-                <div className="meta">
-                  <div>
-                    <span className="muted">Alias:</span> {m.model_key}
+                  <div style={{
+                    width: '100%', height: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: '#1a1a20', color: 'var(--text-dim)'
+                  }}>
+                    No Preview
                   </div>
-                  <div>
-                    <span className="muted">Tag:</span> {tags.join(" ")}
+                )}
+
+                <div className="card-overlay">
+                  <div className="card-title">{title}</div>
+                  <div className="card-subtitle">
+                    {tags.slice(0, 3).join(' ')}
                   </div>
                 </div>
               </div>
@@ -198,36 +222,39 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
         })}
       </div>
 
-      {pageCount > 1 ? (
-        <nav className="pagination" aria-label="Paginación">
-          <button className="pageNav" onClick={() => goToPage(page - 1)} disabled={page <= 1}>
-            ← Anterior
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page <= 1}
+          >
+            ‹
           </button>
 
-          <div className="pageNums" aria-label="Páginas">
-            {pageButtons.map((x, idx) =>
-              x === "…" ? (
-                <span key={`e-${idx}`} className="ellipsis" aria-hidden>
-                  …
-                </span>
-              ) : (
-                <button
-                  key={x}
-                  className={`pageBtn ${x === page ? "active" : ""}`}
-                  onClick={() => goToPage(x)}
-                  aria-current={x === page ? "page" : undefined}
-                >
-                  {x}
-                </button>
-              )
-            )}
-          </div>
+          {pageItems.map((it, idx) => (
+            it === '…' ? (
+              <span key={`ell-${idx}`} style={{ alignSelf: 'center', color: 'var(--text-muted)' }}>…</span>
+            ) : (
+              <button
+                key={it}
+                className={`page-btn ${it === page ? 'active' : ''}`}
+                onClick={() => setPage(it as number)}
+              >
+                {it}
+              </button>
+            )
+          ))}
 
-          <button className="pageNav" onClick={() => goToPage(page + 1)} disabled={page >= pageCount}>
-            Siguiente →
+          <button
+            className="page-btn"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+          >
+            ›
           </button>
-        </nav>
-      ) : null}
+        </div>
+      )}
     </>
   );
 }

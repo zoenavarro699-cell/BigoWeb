@@ -17,6 +17,7 @@ export type BatchRow = {
   sale_url: string | null;
   sale_msg_id?: number | null;
   batch_key?: string | null;
+  thumbnails?: string[];
 };
 
 export type CollabRow = {
@@ -25,6 +26,7 @@ export type CollabRow = {
   title: string | null;
   cover_url: string | null;
   model_keys?: string[] | null;
+  collaborator_profiles?: Array<{ model_key: string; cover_url: string | null }>;
 };
 
 export type CollabBatchRow = {
@@ -35,4 +37,5 @@ export type CollabBatchRow = {
   sale_url: string | null;
   sale_msg_id?: number | null;
   batch_key?: string | null;
+  thumbnails?: string[];
 };

@@ -9,56 +9,109 @@ export default async function HomePage() {
 
   return (
     <main>
-      <div className="nav">
+      <div className="nav glass">
         <div className="brand">
-          <div style={{width:10, height:10, borderRadius:999, background:"var(--accent)"}} />
-          <div className="k">Bigo Catalog</div>
-          <div className="badge">Web</div>
+          <div className="brand-dot" />
+          <div className="brand-name text-gradient">Bigo Catalog</div>
         </div>
-        <div className="row">
-          <a className="btn" href="#models">Modelos</a>
-          <a className="btn" href="#collabs">Collabs</a>
+        <div className="nav-links">
+          <a className="nav-btn" href="#models">Modelos</a>
+          <a className="nav-btn" href="#collabs">Collabs</a>
         </div>
       </div>
 
-      <div className="h1">Catálogo</div>
-      <div className="h2">Entra por modelo y abre sus packs (links directos a Telegram).</div>
+      <div className="hero">
+        <h1 className="text-gradient">Catálogo Exclusivo</h1>
+        <p>Explora nuestra colección premium. Entra por modelo y accede a sus packs privados en Telegram.</p>
+      </div>
 
-      <div className="hr" />
+      <div className="divider" />
 
       <section id="models">
+        <div className="section-header">
+          <div className="section-title">
+            Modelos <span className="badge-pill">{models.length}</span>
+          </div>
+        </div>
         <ModelsClient models={models} />
       </section>
 
-      <div className="hr" />
+      <div className="divider" />
 
       <section id="collabs">
-        <div className="row" style={{justifyContent:"space-between"}}>
-          <div className="k">Collabs</div>
-          <div className="pill">{collabs.length} total</div>
+        <div className="section-header">
+          <div className="section-title">
+            Colaboraciones <span className="badge-pill">{collabs.length}</span>
+          </div>
         </div>
-
-        <div style={{height:10}} />
 
         <div className="grid">
           {collabs.map((c) => (
-            <a key={c.id} className="card" href={`/collabs/${encodeURIComponent(c.collab_key)}`}>
-              <div style={{position:"relative", width:"100%", aspectRatio:"1/1", background:"#0f0f12"}}>
+            <a key={c.collab_key} className="card glass" href={`/collabs/${encodeURIComponent(c.collab_key)}`}>
+              <div className="card-image-wrap">
                 {c.cover_url ? (
                   <Image
+                    className="card-image"
                     src={c.cover_url}
                     alt={c.collab_key}
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
-                    style={{objectFit:"cover"}}
                   />
-                ) : null}
-              </div>
-              <div className="cardBody">
-                <div className="k">Collab {c.collab_key}</div>
-                <div className="m">{c.title || "COLABORACIÓN"}</div>
-                <div className="m">
-                  {Array.isArray(c.model_keys) ? `Modelos: ${c.model_keys.slice(0,4).join(", ")}${c.model_keys.length>4?"...":""}` : ""}
+                ) : (
+                  <div style={{
+                    width: '100%', height: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: '#1a1a20', color: 'var(--text-dim)'
+                  }}>
+                    No Preview
+                  </div>
+                )}
+
+
+                <div className="card-overlay">
+                  <div className="card-title">
+                    {c.title || `Collab ${c.collab_key}`}
+                  </div>
+
+                  {/* Collaborator Profile Images */}
+                  {c.collaborator_profiles && c.collaborator_profiles.length > 0 && (
+                    <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                      {c.collaborator_profiles.map((profile, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            border: "2px solid rgba(255,255,255,0.3)",
+                            background: "#1a1a20"
+                          }}
+                          title={profile.model_key}
+                        >
+                          {profile.cover_url ? (
+                            <Image
+                              src={profile.cover_url}
+                              alt={profile.model_key}
+                              width={32}
+                              height={32}
+                              style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                            />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#666" }}>
+                              ?
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="card-subtitle" style={{ marginTop: 8 }}>
+                    {Array.isArray(c.model_keys)
+                      ? `${c.model_keys.slice(0, 3).join(", ")}${c.model_keys.length > 3 ? "..." : ""}`
+                      : "Multi-Model"}
+                  </div>
                 </div>
               </div>
             </a>
@@ -67,8 +120,8 @@ export default async function HomePage() {
       </section>
 
       <div className="footer">
-        <div>Se actualiza conforme el worker publique batches en Supabase.</div>
-        <div className="small">Revalidate: 30s</div>
+        <div>Actualización automática desde Telegram Worker</div>
+        <div style={{ opacity: 0.5, marginTop: 4 }}>Revalidate: 30s</div>
       </div>
     </main>
   );

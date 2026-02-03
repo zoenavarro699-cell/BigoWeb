@@ -4,17 +4,30 @@ import { makeHashtag } from "@/lib/tag";
 
 export const revalidate = 30;
 
-function Stars({ n }: { n: number | null }) {
-  const v = typeof n === "number" ? n : 0;
-  return <span className="pill">⭐ {v}</span>;
+function PriceBadge({ price }: { price: number | null }) {
+  const p = typeof price === "number" ? price : 0;
+  return (
+    <div style={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      background: "rgba(251, 191, 36, 0.1)",
+      border: "1px solid rgba(251, 191, 36, 0.2)",
+      borderRadius: 8,
+      padding: "4px 10px",
+      color: "#fbbf24",
+      fontWeight: 700,
+      fontSize: 14
+    }}>
+      <span>⭐</span>
+      <span>{p} Stars</span>
+    </div>
+  );
 }
 
 function splitIds(raw: string | null): string[] {
   if (!raw) return [];
-  return raw
-    .split(/[\s,;|]+/g)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  return raw.split(/[\s,;|]+/g).map((s) => s.trim()).filter(Boolean);
 }
 
 function buildTags(modelKey: string, idHash: string | null): string[] {
@@ -36,90 +49,168 @@ export default async function ModelPage({ params }: { params: { modelKey: string
 
   if (!model) {
     return (
-      <main>
-        <a className="btn" href="/">← Volver</a>
-        <div className="h1">No encontrado</div>
-        <div className="h2">No existe el modelo: {modelKey}</div>
+      <main style={{ textAlign: 'center', paddingTop: 100 }}>
+        <a className="nav-btn glass" href="/">← Volver</a>
+        <div className="h1" style={{ marginTop: 40 }}>No encontrado</div>
+        <div className="text-muted">No existe el modelo: {modelKey}</div>
       </main>
     );
   }
 
   const batches = await listBatchesForModel(model.id);
   const tags = buildTags(model.model_key, model.id_hash_canonical);
+  const title = (model.name ?? model.model_key).trim() || model.model_key;
 
   return (
     <main>
-      <div className="row" style={{justifyContent:"space-between"}}>
-        <a className="btn" href="/">← Volver</a>
-        <span className="pill">{tags[0] ?? makeHashtag(model.model_key)}</span>
+      <div className="nav glass">
+        <a className="nav-btn" href="/">← Volver al Catálogo</a>
+        <div style={{ fontWeight: 600 }}>{title}</div>
       </div>
 
-      <div style={{height:12}} />
-
-      <div className="card">
-        <div style={{display:"grid", gridTemplateColumns:"280px 1fr", gap:14}}>
-          <div style={{position:"relative", width:"100%", aspectRatio:"1/1", background:"#0f0f12"}}>
+      <div className="card glass" style={{ padding: 24, marginTop: 24 }}>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+          <div style={{
+            position: "relative",
+            width: "min(100%, 300px)",
+            aspectRatio: "1/1",
+            borderRadius: "var(--radius-md)",
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+          }}>
             {model.cover_url ? (
-              <Image src={model.cover_url} alt={model.model_key} fill style={{objectFit:"cover", objectPosition:"50% 0%"}} />
-            ) : null}
+              <Image
+                src={model.cover_url}
+                alt={model.model_key}
+                fill
+                style={{ objectFit: "cover", objectPosition: "top" }}
+              />
+            ) : (
+              <div style={{ width: '100%', height: '100%', background: '#111' }} />
+            )}
           </div>
-          <div className="cardBody">
-            <div className="h1" style={{marginTop:0}}>{(model.name ?? model.model_key).trim() || model.model_key}</div>
-            <div className="h2" style={{marginBottom:10}}>ID: {model.model_key}</div>
-            <div className="row" style={{flexWrap:"wrap"}}>
-              <span className="pill">Tags:</span>
-              {tags.map((t) => (
-                <span key={t} className="pill mono">{t}</span>
-              ))}
-              {model.id_hash_canonical ? <span className="pill">Hash: {model.id_hash_canonical}</span> : null}
+
+          <div style={{ flex: 1, minWidth: "280px" }}>
+            <h1 className="text-gradient" style={{ fontSize: 42, fontWeight: 800, margin: "0 0 16px" }}>{title}</h1>
+
+            <div style={{ marginBottom: 24 }}>
+              <div className="text-muted" style={{ fontSize: 14, marginBottom: 8 }}>IDENTIFICADORES</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {tags.map((t) => (
+                  <span key={t} className="tag" style={{ padding: "6px 12px", fontSize: 13 }}>{t}</span>
+                ))}
+              </div>
             </div>
-            <div className="hr" />
-            <div className="small">Si aún no ves packs, es porque el worker sigue publicando. Actualiza en unos segundos.</div>
+
+            <div style={{ padding: 16, background: "rgba(255,255,255,0.03)", borderRadius: 12 }}>
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                ℹ️ Los packs se publican automáticamente desde Telegram. Si no ves uno reciente, vuelve a cargar en 30 segundos.
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="hr" />
+      <div className="divider" />
 
-      <div className="row" style={{justifyContent:"space-between"}}>
-        <div className="k">Packs</div>
-        <div className="pill">{batches.length} publicados</div>
+      <div className="section-header">
+        <div className="section-title">
+          Packs Disponibles <span className="badge-pill">{batches.length}</span>
+        </div>
       </div>
 
-      <div style={{height:8}} />
+      <div className="grid">
+        {batches.map((b) => (
+          <div key={b.id} className="card glass" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
 
-      <div className="card">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Items</th>
-              <th>Precio</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            {batches.map((b) => (
-              <tr key={b.id}>
-                <td style={{textTransform:"capitalize"}}>{b.batch_type}</td>
-                <td>{b.item_count ?? "-"}</td>
-                <td><Stars n={b.price_stars} /></td>
-                <td>
-                  {b.sale_url ? (
-                    <a className="btn" href={b.sale_url} target="_blank" rel="noreferrer">Abrir en Telegram</a>
-                  ) : (
-                    <span className="small">Sin link (aún)</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {!batches.length ? (
-              <tr>
-                <td colSpan={4} className="small">Todavía no hay packs publicados para este modelo.</td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+            {/* Header: Type and Price */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: "white", textTransform: "capitalize" }}>
+                  {b.batch_type === 'exclusive' ? 'Pack Exclusivo' : 'Pack Normal'}
+                </div>
+                <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
+                  {b.item_count ? `${b.item_count} videos` : 'Contenido Variado'}
+                </div>
+              </div>
+              <PriceBadge price={b.price_stars} />
+            </div>
+
+            {/* Thumbnails */}
+            {b.thumbnails && b.thumbnails.length > 0 && (
+              <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+                {b.thumbnails.map((url, idx) => (
+                  <div key={idx} style={{
+                    position: "relative",
+                    width: 80,
+                    height: 80,
+                    flexShrink: 0,
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "#222"
+                  }}>
+                    <img
+                      src={url}
+                      alt={`Frame ${idx}`}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      loading="lazy"
+                    />
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "rgba(0,0,0,0.2)"
+                    }}>
+                      <div style={{
+                        width: 24, height: 24,
+                        background: "rgba(255,255,255,0.9)",
+                        borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.3)"
+                      }}>
+                        <div style={{
+                          width: 0, height: 0,
+                          borderLeft: "7px solid #000",
+                          borderTop: "5px solid transparent",
+                          borderBottom: "5px solid transparent",
+                          marginLeft: 2
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Action Button */}
+            <div style={{ marginTop: "auto" }}>
+              {b.sale_url ? (
+                <a
+                  href={b.sale_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="telegram-btn"
+                >
+                  Abrir en Telegram ↗
+                </a>
+              ) : (
+                <div className="text-muted" style={{ textAlign: "center", padding: 12, fontSize: 13, background: "rgba(255,255,255,0.02)", borderRadius: 12 }}>
+                  No disponible
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {!batches.length && (
+          <div style={{ gridColumn: "1/-1", textAlign: "center", padding: 40, color: "var(--text-muted)" }}>
+            Este modelo aún no tiene packs públicos.
+          </div>
+        )}
+      </div>
+
+      <div className="footer">
+        <a href="/" className="text-muted" style={{ borderBottom: "1px dotted #555" }}>Volver al inicio</a>
       </div>
     </main>
   );
