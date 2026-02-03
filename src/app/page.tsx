@@ -2,6 +2,8 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { listModels, listCollabs } from "@/lib/queries";
 import ModelsClient from "@/components/ModelsClient";
+import AgeVerificationModal from "@/components/AgeVerificationModal";
+import VIPSection from "@/components/VIPSection";
 
 export const revalidate = 30;
 
@@ -10,10 +12,12 @@ export default async function HomePage() {
 
   return (
     <main>
+      <AgeVerificationModal />
+
       <div className="nav glass">
         <div className="brand">
           <div className="brand-dot" />
-          <div className="brand-name text-gradient">Bigo Catalog</div>
+          <div className="brand-name text-gradient">Bigo Hot 🔥</div>
         </div>
         <div className="nav-links">
           <a className="nav-btn" href="#models">Modelos</a>
@@ -38,6 +42,10 @@ export default async function HomePage() {
           <ModelsClient models={models} />
         </Suspense>
       </section>
+
+      <div className="divider" />
+
+      <VIPSection />
 
       <div className="divider" />
 

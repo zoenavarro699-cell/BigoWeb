@@ -1,8 +1,11 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Bigo Catalog",
-  description: "Catálogo web conectado a Supabase. Accede a packs por modelo.",
+  title: "Bigo Hot 🔥 - Contenido Exclusivo",
+  description: "Catálogo premium de contenido exclusivo. Accede a packs por modelo y colaboraciones VIP.",
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
