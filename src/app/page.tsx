@@ -3,6 +3,7 @@ import AgeVerificationModal from "@/components/AgeVerificationModal";
 import VIPSection from "@/components/VIPSection";
 import CatalogTabs from "@/components/CatalogTabs";
 import SiteFooter from "@/components/SiteFooter";
+import { Suspense } from "react";
 
 export const revalidate = 30;
 
@@ -28,7 +29,11 @@ export default async function HomePage() {
       </div>
 
       {/* Main Tabbed Layout */}
-      <CatalogTabs models={models} collabs={collabs} />
+      <div style={{ minHeight: '100vh' }}>
+        <Suspense fallback={<div style={{ padding: 40, textAlign: 'center' }}>Cargando catálogo...</div>}>
+          <CatalogTabs models={models} collabs={collabs} />
+        </Suspense>
+      </div>
 
       <div className="divider" />
 
