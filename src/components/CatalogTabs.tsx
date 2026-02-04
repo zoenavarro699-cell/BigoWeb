@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import ModelsClient from './ModelsClient';
 import Image from 'next/image';
 
@@ -102,7 +102,9 @@ export default function CatalogTabs({
             <div style={{ minHeight: '600px' }}>
                 {activeTab === 'models' ? (
                     <section id="models-view" className="fade-in">
-                        <ModelsClient models={models} />
+                        <Suspense fallback={<div className="text-muted" style={{ padding: 20 }}>Cargando filtros...</div>}>
+                            <ModelsClient models={models} />
+                        </Suspense>
                     </section>
                 ) : (
                     <section id="collabs-view" className="fade-in">
