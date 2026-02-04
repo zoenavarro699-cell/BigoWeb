@@ -138,7 +138,7 @@ export default async function ModelPage({ params }: { params: { modelKey: string
 
             {/* Thumbnails */}
             {b.thumbnails && b.thumbnails.length > 0 && (
-              <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
+              <div className="thin-scrollbar" style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4 }}>
                 {b.thumbnails.map((url, idx) => (
                   <div key={idx} style={{
                     position: "relative",

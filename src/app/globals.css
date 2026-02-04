@@ -73,12 +73,14 @@ a {
 .text-gradient {
   background: linear-gradient(135deg, #fff 0%, #d8b4fe 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-accent {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -271,6 +273,8 @@ a {
 
 .search-input {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--glass-border);
   padding: 12px 16px 12px 42px;
@@ -417,6 +421,29 @@ a {
   transition: transform 0.2s;
 }
 
-.telegram-btn:hover {
-  transform: scale(1.02);
+
+
+/* Custom dark thin scrollbar */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  /* Horizontal height */
+  width: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }

@@ -9,7 +9,6 @@ type ModelForGrid = {
   name: string | null;
   id_hash_canonical?: string | null;
   cover_url?: string | null;
-  // Compat con versiones anteriores
   tags?: string[] | null;
 };
 
@@ -45,26 +44,18 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Initialize state from URL params or defaults
+  // Initialize state
   const [query, setQuery] = useState(() => searchParams.get('q') || '');
-  const [page, setPage] = useState(() => {
-    const p = parseInt(searchParams.get('page') || '1', 10);
-    return isNaN(p) || p < 1 ? 1 : p;
-  });
-  const [pageSize, setPageSize] = useState(() => {
-    const s = parseInt(searchParams.get('size') || '20', 10);
-    return [20, 40, 80].includes(s) ? s : 20;
-  });
+  const [visibleCount, setVisibleCount] = useState(20);
 
-  // Sync state to URL
+  // Sync query to URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     if (query) params.set('q', query); else params.delete('q');
-    if (page > 1) params.set('page', page.toString()); else params.delete('page');
-    if (pageSize !== 20) params.set('size', pageSize.toString()); else params.delete('size');
+    // We don't sync visibleCount to URL to keep "load more" simple (restoring scroll position is complex otherwise)
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [query, page, pageSize, pathname, router, searchParams]);
+  }, [query, pathname, router, searchParams]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -88,73 +79,39 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
   }, [models, query]);
 
   const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  // Reset page when query or pageSize changes (logic handled in useEffect above implicitly? No, need explicit reset if user types)
-  useEffect(() => {
-    // If the query changes effectively, we might want to reset page to 1 if the current page is out of bounds.
-    // But strictly, if user types, usually we want page 1.
-    // Let's rely on the user manual interaction or a specific check.
-    // Actually, standard behavior: typing search = reset to page 1.
-    // But `setPage(1)` inside the same render cycle as `setQuery` is tricky if not coupled.
-    // We'll let the user handle it or add a specific effect if needed. 
-    // For now, let's just ensure if refined count < current page start, we clamp.
-    // The clamp logic is handled in the `current` slice calculation?
-    // Yes: `const startIndex = ...` uses page directly.
-    // Best practice: Set page to 1 when query changes.
-  }, []);
 
   // Handlers
-  const handleSortChange = (size: number) => {
-    setPageSize(size);
-    setPage(1); // Reset page on size change
-  }
-
   const handleSearchChange = (val: string) => {
     setQuery(val);
-    setPage(1); // Reset page on search change
+    setVisibleCount(20); // Reset visible count on search
   }
 
-  const current = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, page, pageSize]);
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 20);
+  }
 
-  const startIndex = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endIndex = Math.min(page * pageSize, total);
-
-  // Pagination logic
-  const pageItems = useMemo(() => {
-    const items: (number | '…')[] = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) items.push(i);
-      return items;
-    }
-    items.push(1);
-    const start = Math.max(2, page - 1);
-    const end = Math.min(totalPages - 1, page + 1);
-
-    if (start > 2) items.push('…');
-    for (let i = start; i <= end; i++) items.push(i);
-    if (end < totalPages - 1) items.push('…');
-    items.push(totalPages);
-
-    return items;
-  }, [page, totalPages]);
+  const current = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < total;
 
   return (
     <>
-      <div className="toolbar-grid glass">
+      <div className="toolbar-grid glass" style={{
+        // Simplificar grid para evitar overlap: solo info y search
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 16,
+        alignItems: 'center'
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 'fit-content' }}>
           <span className="badge-pill" style={{ background: 'var(--primary-glow)', color: 'white' }}>
             {total} Modelos
           </span>
           <span className="text-muted" style={{ fontSize: 13 }}>
-            {startIndex}-{endIndex}
+            Mostrando {current.length}
           </span>
         </div>
 
-        <div className="search-wrap" style={{ width: '100%' }}>
+        <div className="search-wrap" style={{ flex: 1, minWidth: 200 }}>
           <span className="search-icon">🔍</span>
           <input
             className="search-input"
@@ -162,18 +119,6 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
             value={query}
             onChange={(e) => handleSearchChange(e.target.value)}
           />
-        </div>
-
-        <div style={{ minWidth: 'fit-content' }}>
-          <select
-            className="select-input"
-            value={pageSize}
-            onChange={(e) => handleSortChange(parseInt(e.target.value, 10))}
-          >
-            <option value={20}>20 / pág</option>
-            <option value={40}>40 / pág</option>
-            <option value={80}>80 / pág</option>
-          </select>
         </div>
       </div>
 
@@ -187,9 +132,6 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
               key={m.model_key}
               className="card glass"
               href={`/models/${encodeURIComponent(m.model_key)}`}
-              onClick={() => {
-                // Optional: If we wanted to force push state before navigating, but the useEffect handles it.
-              }}
             >
               <div className="card-image-wrap">
                 {m.cover_url ? (
@@ -222,36 +164,14 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
         })}
       </div>
 
-      {totalPages > 1 && (
-        <div className="pagination">
+      {hasMore && (
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
           <button
             className="page-btn"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page <= 1}
+            style={{ width: 'auto', padding: '12px 32px', borderRadius: 999 }}
+            onClick={handleLoadMore}
           >
-            ‹
-          </button>
-
-          {pageItems.map((it, idx) => (
-            it === '…' ? (
-              <span key={`ell-${idx}`} style={{ alignSelf: 'center', color: 'var(--text-muted)' }}>…</span>
-            ) : (
-              <button
-                key={it}
-                className={`page-btn ${it === page ? 'active' : ''}`}
-                onClick={() => setPage(it as number)}
-              >
-                {it}
-              </button>
-            )
-          ))}
-
-          <button
-            className="page-btn"
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-            disabled={page >= totalPages}
-          >
-            ›
+            Ver más modelos ({total - current.length} restantes)
           </button>
         </div>
       )}
