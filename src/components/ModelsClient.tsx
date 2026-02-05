@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { sanitizeKeyForTag, makeHashtag } from '@/lib/tag';
+import { useAuth } from '@/lib/AuthContext';
+import { isNameSimilar } from '@/lib/stringUtils';
 
 type ModelForGrid = {
   model_key: string;
@@ -43,6 +45,9 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { profile, user } = useAuth(); // Destructure user for simple auth check
+  const isVerified = profile?.is_verified ?? false;
+  const isFemale = profile?.gender_detected === 'female';
 
   // Initialize state
   const [query, setQuery] = useState(() => searchParams.get('q') || '');
@@ -59,9 +64,21 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return models;
 
-    return models.filter((m) => {
+    // 1. First filter by Competitor Blocking (if female)
+    let candidates = models;
+    if (isVerified && isFemale && profile?.username) {
+      candidates = models.filter(m => {
+        const modelName = m.name || m.model_key;
+        // If names are too similar, hide this model from the female user
+        return !isNameSimilar(modelName, profile.username!);
+      });
+    }
+
+    if (!q) return candidates;
+
+    // 2. Then filter by search query
+    return candidates.filter((m) => {
       const title = displayTitle(m).toLowerCase();
       const id = (m.model_key || '').toLowerCase();
       const alias = (m.id_hash_canonical || '').toLowerCase();
@@ -76,7 +93,7 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
         tagMatch
       );
     });
-  }, [models, query]);
+  }, [models, query, isVerified, isFemale, profile]);
 
   const total = filtered.length;
 
@@ -127,39 +144,93 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
           const title = displayTitle(m);
           const tags = buildTags(m);
 
+          // Access Control Logic
+          const isLoggedIn = !!profile; // or user
+
+          let blurAmount = '0px';
+          let showLock = false;
+
+          if (!isLoggedIn) {
+            // Guest: Heavy blur + Lock
+            blurAmount = '20px';
+            showLock = true;
+          } else if (!isVerified) {
+            // User but not verified: Medium blur
+            blurAmount = '15px';
+            showLock = true;
+          } else if (isFemale) {
+            // Female Verified: Weak blur (Competitor protection?)
+            blurAmount = '5px';
+          }
+
           return (
-            <a
+            <div
               key={m.model_key}
               className="card glass"
-              href={`/models/${encodeURIComponent(m.model_key)}`}
+              style={{ position: 'relative', overflow: 'hidden' }}
             >
-              <div className="card-image-wrap">
-                {m.cover_url ? (
-                  <img
-                    className="card-image"
-                    src={m.cover_url}
-                    alt={title}
-                    loading="lazy"
-                    style={{ objectFit: 'cover', objectPosition: '50% 0%' }}
-                  />
-                ) : (
-                  <div style={{
-                    width: '100%', height: '100%',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: '#1a1a20', color: 'var(--text-dim)'
-                  }}>
-                    No Preview
-                  </div>
-                )}
+              {/* Wrap with anchor only if allowed, or always allow click to go to detail (which will also be protected)? 
+                 Let's allow click but show visual restriction.
+             */}
+              <a href={`/models/${encodeURIComponent(m.model_key)}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+                <div className="card-image-wrap">
+                  {m.cover_url ? (
+                    <img
+                      className="card-image"
+                      src={m.cover_url}
+                      alt={title}
+                      loading="lazy"
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: '50% 0%',
+                        filter: `blur(${blurAmount})`,
+                        transition: 'filter 0.3s ease'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%', height: '100%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: '#1a1a20', color: 'var(--text-dim)'
+                    }}>
+                      No Preview
+                    </div>
+                  )}
 
-                <div className="card-overlay">
-                  <div className="card-title">{title}</div>
-                  <div className="card-subtitle">
-                    {tags.slice(0, 3).join(' ')}
+                  {/* Overlay for Guests */}
+                  {!isLoggedIn && (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.6)', zIndex: 5, textAlign: 'center', padding: 10
+                    }}>
+                      <span style={{ fontSize: 32, marginBottom: 8 }}>🔒</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
+                        Regístrate para ver
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Overlay for Unverified Logged In */}
+                  {isLoggedIn && !isVerified && (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.3)', pointerEvents: 'none', zIndex: 2
+                    }}>
+                      <span style={{ fontSize: 24 }}>🔒</span>
+                    </div>
+                  )}
+
+                  <div className="card-overlay" style={{ zIndex: 3 }}>
+                    <div className="card-title">{title}</div>
+                    <div className="card-subtitle">
+                      {tags.slice(0, 3).join(' ')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </div>
           );
         })}
       </div>

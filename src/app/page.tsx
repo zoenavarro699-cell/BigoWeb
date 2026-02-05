@@ -3,6 +3,7 @@ import AgeVerificationModal from "@/components/AgeVerificationModal";
 import VIPSection from "@/components/VIPSection";
 import CatalogTabs from "@/components/CatalogTabs";
 import SiteFooter from "@/components/SiteFooter";
+import TopBar from "@/components/TopBar";
 import { Suspense } from "react";
 
 export const revalidate = 30;
@@ -14,14 +15,7 @@ export default async function HomePage() {
     <main>
       <AgeVerificationModal />
 
-      <div className="nav glass">
-        <div className="brand">
-          <div className="brand-dot" />
-          <div className="brand-name text-gradient">Bigo Hot 🔥</div>
-        </div>
-
-        {/* Simple top links could go here if needed, but we have tabs below now */}
-      </div>
+      <TopBar />
 
       <div className="hero">
         <h1 className="text-gradient">Catálogo Exclusivo</h1>

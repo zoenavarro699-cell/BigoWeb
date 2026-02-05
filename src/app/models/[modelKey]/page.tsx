@@ -1,8 +1,11 @@
-import Image from "next/image";
+import Link from "next/link";
 import { getModelByKey, listBatchesForModel } from "@/lib/queries";
 import { makeHashtag } from "@/lib/tag";
+import { ProtectedCover, ProtectedImage } from "@/components/ProtectedContent";
 
 export const revalidate = 30;
+
+// ... (PriceBadge, splitIds, buildTags functions remain same)
 
 function PriceBadge({ price }: { price: number | null }) {
   const p = typeof price === "number" ? price : 0;
@@ -79,11 +82,9 @@ export default async function ModelPage({ params }: { params: { modelKey: string
             boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
           }}>
             {model.cover_url ? (
-              <Image
+              <ProtectedCover
                 src={model.cover_url}
                 alt={model.model_key}
-                fill
-                style={{ objectFit: "cover", objectPosition: "top" }}
               />
             ) : (
               <div style={{ width: '100%', height: '100%', background: '#111' }} />
@@ -150,33 +151,11 @@ export default async function ModelPage({ params }: { params: { modelKey: string
                     border: "1px solid rgba(255,255,255,0.1)",
                     background: "#222"
                   }}>
-                    <img
+                    <ProtectedImage
                       src={url}
                       alt={`Frame ${idx}`}
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      loading="lazy"
                     />
-                    <div style={{
-                      position: "absolute", inset: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "rgba(0,0,0,0.2)"
-                    }}>
-                      <div style={{
-                        width: 24, height: 24,
-                        background: "rgba(255,255,255,0.9)",
-                        borderRadius: "50%",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.3)"
-                      }}>
-                        <div style={{
-                          width: 0, height: 0,
-                          borderLeft: "7px solid #000",
-                          borderTop: "5px solid transparent",
-                          borderBottom: "5px solid transparent",
-                          marginLeft: 2
-                        }} />
-                      </div>
-                    </div>
                   </div>
                 ))}
               </div>

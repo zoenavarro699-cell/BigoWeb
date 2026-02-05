@@ -1,7 +1,8 @@
 import "./globals.css";
+import { AuthProvider } from '@/lib/AuthContext';
 
 export const metadata = {
-  title: "Bigo Hot 🔥 - Contenido Exclusivo",
+  title: "BIgHot 🔥 - Contenido Exclusivo",
   description: "Catálogo premium de contenido exclusivo. Accede a packs por modelo y colaboraciones VIP.",
   icons: {
     icon: '/icon.png',
@@ -18,7 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <div className="bg-gradient" />
-        <div className="container">{children}</div>
+        <AuthProvider>
+          <div className="container">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

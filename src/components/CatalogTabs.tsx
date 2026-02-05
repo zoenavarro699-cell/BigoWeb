@@ -24,6 +24,7 @@ export default function CatalogTabs({
 }) {
     const [activeTab, setActiveTab] = useState<'models' | 'collabs'>('models');
 
+
     return (
         <>
             {/* Sticky Navigation Bar */}
@@ -31,12 +32,12 @@ export default function CatalogTabs({
                 position: 'sticky',
                 top: 0,
                 zIndex: 100,
-                background: 'rgba(5, 5, 7, 0.95)', // Increased opacity for better separation
+                background: 'rgba(5, 5, 7, 0.95)',
                 backdropFilter: 'blur(12px)',
                 borderBottom: '1px solid var(--glass-border)',
                 padding: '12px 0',
                 marginBottom: 32,
-                marginTop: -1 // HACK: Prevent gap
+                marginTop: -1
             }}>
                 <div className="container" style={{ padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
 
@@ -48,12 +49,9 @@ export default function CatalogTabs({
                             style={{
                                 background: activeTab === 'models' ? 'var(--primary)' : 'transparent',
                                 color: activeTab === 'models' ? 'white' : 'var(--text-muted)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
+                                display: 'flex', alignItems: 'center', gap: 8,
                                 boxShadow: activeTab === 'models' ? '0 0 15px var(--primary-glow)' : 'none',
-                                cursor: 'pointer',
-                                border: 'none'
+                                cursor: 'pointer', border: 'none'
                             }}
                         >
                             Modelos <span className="badge-pill" style={{
@@ -68,12 +66,9 @@ export default function CatalogTabs({
                             style={{
                                 background: activeTab === 'collabs' ? 'var(--secondary)' : 'transparent',
                                 color: activeTab === 'collabs' ? 'white' : 'var(--text-muted)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
+                                display: 'flex', alignItems: 'center', gap: 8,
                                 boxShadow: activeTab === 'collabs' ? '0 0 15px var(--secondary-glow)' : 'none',
-                                cursor: 'pointer',
-                                border: 'none'
+                                cursor: 'pointer', border: 'none'
                             }}
                         >
                             Collabs <span className="badge-pill" style={{
@@ -83,17 +78,14 @@ export default function CatalogTabs({
                         </button>
                     </div>
 
-                    <a href="#vip-section" className="telegram-btn" style={{
-                        padding: '8px 20px',
-                        fontSize: 14,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        borderRadius: 999,
-                        textDecoration: 'none'
-                    }}>
-                        <span>👑</span> Obtener VIP
-                    </a>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <a href="#vip-section" className="telegram-btn" style={{
+                            padding: '8px 20px', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8,
+                            borderRadius: 999, textDecoration: 'none'
+                        }}>
+                            <span>👑</span> Obtener VIP
+                        </a>
+                    </div>
 
                 </div>
             </div>
@@ -108,7 +100,7 @@ export default function CatalogTabs({
                     </section>
                 ) : (
                     <section id="collabs-view" className="fade-in">
-                        {/* Collabs Grid (Replicated from previous page.tsx) */}
+                        {/* Collabs Grid */}
                         <div className="toolbar-grid glass" style={{ marginBottom: 24 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <span className="badge-pill" style={{ background: 'var(--secondary-glow)', color: 'white' }}>
@@ -141,7 +133,6 @@ export default function CatalogTabs({
                                                 No Preview
                                             </div>
                                         )}
-
 
                                         <div className="card-overlay">
                                             <div className="card-title">
