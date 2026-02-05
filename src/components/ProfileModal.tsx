@@ -166,6 +166,11 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
     );
 }
 
+
+
+
+
+
 export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const { user, profile, signOut } = useAuth();
     const [loading, setLoading] = useState(false);
@@ -225,6 +230,11 @@ export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onC
                         {profile?.is_verified ? 'Verificado' : 'No Verificado'}
                     </div>
                 </div>
+
+
+
+                {/* Edit Profile Section */}
+
 
                 {/* Password Section */}
                 <ChangePasswordSection userEmail={user.email} />

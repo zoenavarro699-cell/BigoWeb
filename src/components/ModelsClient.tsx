@@ -67,13 +67,34 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
 
     // 1. First filter by Competitor Blocking (if female)
     let candidates = models;
-    if (isVerified && isFemale && profile?.username) {
+    if (isVerified && isFemale) {
+      const username = profile?.username;
+      const fullName = profile?.full_name;
+
       candidates = models.filter(m => {
         const modelName = m.name || m.model_key;
-        // If names are too similar, hide this model from the female user
-        return !isNameSimilar(modelName, profile.username!);
+
+        // 1. Check Username
+        if (username) {
+          if (isNameSimilar(modelName, username)) return false;
+          // Check parts of username
+          const parts = username.split(/[\s_\-\.]+/).filter(p => p.length > 3);
+          for (const p of parts) if (isNameSimilar(modelName, p)) return false;
+        }
+
+        // 2. Check Full Name (More robust)
+        if (fullName) {
+          if (isNameSimilar(modelName, fullName)) return false;
+          // Check parts of full name (First name, Last name)
+          const parts = fullName.split(/[\s_\-\.]+/).filter(p => p.length > 3);
+          for (const p of parts) if (isNameSimilar(modelName, p)) return false;
+        }
+
+        return true;
       });
     }
+
+
 
     if (!q) return candidates;
 
@@ -180,11 +201,15 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
                       src={m.cover_url}
                       alt={title}
                       loading="lazy"
+                      draggable={false}
+                      onContextMenu={(e) => e.preventDefault()}
                       style={{
                         objectFit: 'cover',
                         objectPosition: '50% 0%',
                         filter: `blur(${blurAmount})`,
-                        transition: 'filter 0.3s ease'
+                        transition: 'filter 0.3s ease',
+                        userSelect: 'none',
+                        pointerEvents: 'none' // Prevent interaction
                       }}
                     />
                   ) : (

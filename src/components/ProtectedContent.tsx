@@ -25,10 +25,14 @@ export function ProtectedImage({ src, alt, style, className, onClick }: {
                 src={src}
                 alt={alt}
                 className={className}
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
                 style={{
                     ...style,
                     filter: `blur(${blurAmount})`,
-                    transition: 'filter 0.3s ease'
+                    transition: 'filter 0.3s ease',
+                    userSelect: 'none',
+                    pointerEvents: 'none'
                 }}
                 onClick={onClick}
             />
@@ -60,11 +64,15 @@ export function ProtectedCover({ src, alt }: { src: string, alt: string }) {
                 src={src}
                 alt={alt}
                 fill
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
                 style={{
                     objectFit: "cover",
                     objectPosition: "top",
                     filter: `blur(${blurAmount})`,
-                    transition: 'filter 0.3s ease'
+                    transition: 'filter 0.3s ease',
+                    userSelect: 'none',
+                    pointerEvents: 'none'
                 }}
             />
             {!isVerified && (

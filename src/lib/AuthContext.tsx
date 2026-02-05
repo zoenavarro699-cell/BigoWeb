@@ -8,6 +8,7 @@ type Profile = {
     id: string;
     is_verified: boolean;
     username: string | null;
+    full_name?: string | null;
     gender_detected?: 'male' | 'female' | null;
     age_detected?: number | null;
     deletion_requested_at?: string | null;

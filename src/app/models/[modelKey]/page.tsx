@@ -46,9 +46,10 @@ function buildTags(modelKey: string, idHash: string | null): string[] {
   return out;
 }
 
-export default async function ModelPage({ params }: { params: { modelKey: string } }) {
-  const modelKey = decodeURIComponent(params.modelKey);
-  const model = await getModelByKey(modelKey);
+export default async function ModelPage({ params }: { params: Promise<{ modelKey: string }> }) {
+  const { modelKey } = await params;
+  const decodedKey = decodeURIComponent(modelKey);
+  const model = await getModelByKey(decodedKey);
 
   if (!model) {
     return (
