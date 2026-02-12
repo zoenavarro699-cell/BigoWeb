@@ -176,6 +176,7 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
 
 export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const { user, profile, signOut } = useAuth();
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState('');
 
