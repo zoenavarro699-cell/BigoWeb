@@ -20,6 +20,9 @@ type AuthContextType = {
     loading: boolean;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
+    openLoginModal: () => void;
+    closeLoginModal: () => void;
+    isLoginModalOpen: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -28,6 +31,9 @@ const AuthContext = createContext<AuthContextType>({
     loading: true,
     signInWithGoogle: async () => { },
     signOut: async () => { },
+    openLoginModal: () => { },
+    closeLoginModal: () => { },
+    isLoginModalOpen: false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,6 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+    const openLoginModal = () => setIsLoginModalOpen(true);
+    const closeLoginModal = () => setIsLoginModalOpen(false);
 
     useEffect(() => {
         // Check active session
@@ -96,7 +106,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signOut }}>
+        <AuthContext.Provider value={{
+            user, profile, loading, signInWithGoogle, signOut,
+            openLoginModal, closeLoginModal, isLoginModalOpen
+        }}>
             {children}
         </AuthContext.Provider>
     );

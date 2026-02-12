@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { loadModels, detectFace, BiometricResult } from '@/lib/faceUtils';
+import ClientText from './ClientText';
+import { useLanguage } from '@/lib/LanguageContext';
 
 export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const router = useRouter();
+    const { t } = useLanguage();
     const [isSignUp, setIsSignUp] = useState(false);
     const [step, setStep] = useState<'form' | 'camera' | 'forgot'>('form');
 
@@ -53,7 +56,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                 videoRef.current.srcObject = s;
             }
         } catch (err) {
-            setError('No se pudo acceder a la cámara. Verifica los permisos.');
+            setError(t('camera_error'));
         }
     };
 
@@ -65,7 +68,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
         try {
             const result = await detectFace(videoRef.current);
             if (!result) {
-                setError('No se detectó ningún rostro. Asegúrate de tener buena iluminación.');
+                setError(t('face_error'));
                 setScanning(false);
                 return;
             }
@@ -226,7 +229,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                         </div>
 
                         <p style={{ textAlign: 'center', fontSize: 14, color: '#ccc' }}>
-                            Por favor, mira a la cámara para verificar que eres una persona real.
+                            <ClientText k="camera_instructions" defaultText="Por favor, mira a la cámara para verificar que eres una persona real." />
                         </p>
 
                         {error && <div className="error-msg">{error}</div>}
@@ -237,7 +240,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                             disabled={scanning || !modelsLoaded}
                             style={{ width: '100%' }}
                         >
-                            {scanning ? 'Analizando...' : 'Capturar y Verificar'}
+                            {scanning ? <ClientText k="analyzing" defaultText="Analizando..." /> : <ClientText k="capture_and_verify" defaultText="Capturar y Verificar" />}
                         </button>
 
                         <button
@@ -247,7 +250,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                                 if (stream) stream.getTracks().forEach(t => t.stop());
                             }}
                         >
-                            Cancelar
+                            <ClientText k="cancel" defaultText="Cancelar" />
                         </button>
                     </div>
                 ) : (
@@ -255,32 +258,32 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                         {isSignUp && (
                             <>
                                 <div>
-                                    <label>Nombre Completo</label>
+                                    <label><ClientText k="full_name_label" defaultText="Nombre Completo" /></label>
                                     <input
                                         type="text"
                                         required
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
                                         className="input-field"
-                                        placeholder="Ej. Juan Pérez"
+                                        placeholder={t('full_name_placeholder')}
                                     />
                                 </div>
                                 <div>
-                                    <label>Nombre de Usuario</label>
+                                    <label><ClientText k="username_label" defaultText="Nombre de Usuario" /></label>
                                     <input
                                         type="text"
                                         required
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
                                         className="input-field"
-                                        placeholder="Ej. juanperez99"
+                                        placeholder={t('username_placeholder')}
                                     />
                                 </div>
                             </>
                         )}
 
                         <div>
-                            <label>Email</label>
+                            <label><ClientText k="email_label" defaultText="Email" /></label>
                             <input
                                 type="email"
                                 required
@@ -291,7 +294,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                         </div>
 
                         <div>
-                            <label>Contraseña</label>
+                            <label><ClientText k="password_label" defaultText="Contraseña" /></label>
                             <input
                                 type="password"
                                 required
@@ -302,7 +305,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                             {!isSignUp && (
                                 <div style={{ textAlign: 'right', marginTop: 4 }}>
                                     <button type="button" className="text-btn" style={{ fontSize: 12 }} onClick={() => setStep('forgot')}>
-                                        ¿Olvidaste tu contraseña?
+                                        <ClientText k="forgot_password" defaultText="¿Olvidaste tu contraseña?" />
                                     </button>
                                 </div>
                             )}
@@ -312,25 +315,25 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                         {message && <div className="success-msg">{message}</div>}
 
                         <button type="submit" className="primary-btn" disabled={loading}>
-                            {loading ? 'Procesando...' : (isSignUp ? 'Siguiente: Verificación' : 'Entrar')}
+                            {loading ? <ClientText k="processing" defaultText="Procesando..." /> : (isSignUp ? <ClientText k="next_verification" defaultText="Siguiente: Verificación" /> : <ClientText k="enter" defaultText="Entrar" />)}
                         </button>
                     </form>
                 )}
 
                 {step === 'form' && (
                     <div style={{ marginTop: 16, textAlign: 'center', fontSize: 14 }}>
-                        {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
+                        {isSignUp ? <ClientText k="already_have_account" defaultText="¿Ya tienes cuenta?" /> : <ClientText k="no_account" defaultText="¿No tienes cuenta?" />}
                         {' '}
                         <button
                             type="button"
                             className="text-btn"
                             onClick={() => { setIsSignUp(!isSignUp); setMessage(''); setError(''); }}
                         >
-                            {isSignUp ? 'Inicia Sesión' : 'Regístrate'}
+                            {isSignUp ? <ClientText k="login_now" defaultText="Inicia Sesión" /> : <ClientText k="register_now" defaultText="Regístrate" />}
                         </button>
 
                         <div style={{ marginTop: 24, padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, fontSize: 11, color: '#888', lineHeight: '1.4' }}>
-                            🔒 <strong>Privacidad:</strong> Los datos proporcionados son exclusivamente para fines de autenticación y verificación de edad. No se mostrarán públicamente. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento desde tu perfil.
+                            🔒 <ClientText k="privacy_policy_text" defaultText="Privacidad: Los datos proporcionados son exclusivamente para fines de autenticación y verificación de edad. No se mostrarán públicamente. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento desde tu perfil." />
                         </div>
                     </div>
                 )}

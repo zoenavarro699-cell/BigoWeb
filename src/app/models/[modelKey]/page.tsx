@@ -2,6 +2,9 @@ import Link from "next/link";
 import { getModelByKey, listBatchesForModel } from "@/lib/queries";
 import { makeHashtag } from "@/lib/tag";
 import { ProtectedCover, ProtectedImage } from "@/components/ProtectedContent";
+import AccessButton from "@/components/AccessButton";
+import LanguageSwitch from "@/components/LanguageSwitch";
+import ClientText from "@/components/ClientText";
 
 export const revalidate = 30;
 
@@ -54,9 +57,11 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
   if (!model) {
     return (
       <main style={{ textAlign: 'center', paddingTop: 100 }}>
-        <a className="nav-btn glass" href="/">← Volver</a>
-        <div className="h1" style={{ marginTop: 40 }}>No encontrado</div>
-        <div className="text-muted">No existe el modelo: {modelKey}</div>
+        <a className="nav-btn glass" href="/">
+          <ClientText k="back_home" defaultText="← Volver al Catálogo" />
+        </a>
+        <div className="h1" style={{ marginTop: 40 }}>Not Found</div>
+        <div className="text-muted">Model not found: {modelKey}</div>
       </main>
     );
   }
@@ -68,8 +73,13 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
   return (
     <main>
       <div className="nav glass">
-        <a className="nav-btn" href="/">← Volver al Catálogo</a>
-        <div style={{ fontWeight: 600 }}>{title}</div>
+        <a className="nav-btn" href="/">
+          <ClientText k="back_home" defaultText="← Volver al Catálogo" />
+        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontWeight: 600 }}>{title}</div>
+          <LanguageSwitch />
+        </div>
       </div>
 
       <div className="card glass" style={{ padding: 24, marginTop: 24 }}>
@@ -96,7 +106,7 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
             <h1 className="text-gradient" style={{ fontSize: 42, fontWeight: 800, margin: "0 0 16px" }}>{title}</h1>
 
             <div style={{ marginBottom: 24 }}>
-              <div className="text-muted" style={{ fontSize: 14, marginBottom: 8 }}>IDENTIFICADORES</div>
+              <div className="text-muted" style={{ fontSize: 14, marginBottom: 8 }}><ClientText k="identifiers" defaultText="IDENTIFICADORES" /></div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {tags.map((t) => (
                   <span key={t} className="tag" style={{ padding: "6px 12px", fontSize: 13 }}>{t}</span>
@@ -106,7 +116,7 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
 
             <div style={{ padding: 16, background: "rgba(255,255,255,0.03)", borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-                ℹ️ Los packs se publican automáticamente desde Telegram. Si no ves uno reciente, vuelve a cargar en 30 segundos.
+                ℹ️ <ClientText k="auto_publish_notice" defaultText="Los packs se publican automáticamente desde Telegram..." />
               </div>
             </div>
           </div>
@@ -117,7 +127,7 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
 
       <div className="section-header">
         <div className="section-title">
-          Packs Disponibles <span className="badge-pill">{batches.length}</span>
+          <ClientText k="packs_available" defaultText="Packs Disponibles" /> <span className="badge-pill">{batches.length}</span>
         </div>
       </div>
 
@@ -129,10 +139,10 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: "white", textTransform: "capitalize" }}>
-                  {b.batch_type === 'exclusive' ? 'Pack Exclusivo' : 'Pack Normal'}
+                  {b.batch_type === 'exclusive' ? <ClientText k="pack_exclusive" defaultText="Pack Exclusivo" /> : <ClientText k="pack_normal" defaultText="Pack Normal" />}
                 </div>
                 <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: 4 }}>
-                  {b.item_count ? `${b.item_count} videos` : 'Contenido Variado'}
+                  {b.item_count ? `${b.item_count} ` : ''} <ClientText k="videos_count" defaultText="videos" />
                 </div>
               </div>
               <PriceBadge price={b.price_stars} />
@@ -165,17 +175,10 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
             {/* Action Button */}
             <div style={{ marginTop: "auto" }}>
               {b.sale_url ? (
-                <a
-                  href={b.sale_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="telegram-btn"
-                >
-                  Abrir en Telegram ↗
-                </a>
+                <AccessButton url={b.sale_url} />
               ) : (
                 <div className="text-muted" style={{ textAlign: "center", padding: 12, fontSize: 13, background: "rgba(255,255,255,0.02)", borderRadius: 12 }}>
-                  No disponible
+                  <ClientText k="unavailable" defaultText="No disponible" />
                 </div>
               )}
             </div>
@@ -190,7 +193,9 @@ export default async function ModelPage({ params }: { params: Promise<{ modelKey
       </div>
 
       <div className="footer">
-        <a href="/" className="text-muted" style={{ borderBottom: "1px dotted #555" }}>Volver al inicio</a>
+        <a href="/" className="text-muted" style={{ borderBottom: "1px dotted #555" }}>
+          <ClientText k="back_home" defaultText="← Volver al Catálogo" />
+        </a>
       </div>
     </main>
   );

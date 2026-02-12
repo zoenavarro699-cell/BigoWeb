@@ -1,6 +1,9 @@
+
 import { listModels, listCollabs } from "@/lib/queries";
 import AgeVerificationModal from "@/components/AgeVerificationModal";
 import VIPSection from "@/components/VIPSection";
+import LanguageSwitch from "@/components/LanguageSwitch";
+import ClientText from "@/components/ClientText";
 import CatalogTabs from "@/components/CatalogTabs";
 import SiteFooter from "@/components/SiteFooter";
 import TopBar from "@/components/TopBar";
@@ -18,8 +21,8 @@ export default async function HomePage() {
       <TopBar />
 
       <div className="hero">
-        <h1 className="text-gradient">Catálogo Exclusivo</h1>
-        <p>Explora nuestra colección premium. Entra por modelo y accede a sus packs privados en Telegram.</p>
+        <h1 className="text-gradient"><ClientText k="hero_title" defaultText="Catálogo Exclusivo" /></h1>
+        <p><ClientText k="hero_desc" defaultText="Explora nuestra colección premium. Entra por modelo y accede a sus packs privados en Telegram." /></p>
       </div>
 
       {/* Main Tabbed Layout */}
@@ -36,7 +39,7 @@ export default async function HomePage() {
         <VIPSection />
       </div>
 
-      <SiteFooter />
+
     </main>
   );
 }

@@ -3,6 +3,8 @@
 import { useState, Suspense } from 'react';
 import ModelsClient from './ModelsClient';
 import Image from 'next/image';
+import ClientText from './ClientText';
+import { useLanguage } from '@/lib/LanguageContext';
 
 // Reuse types if possible, or redefine locally if not exported. 
 // Ideally these should be in a types file, but for now we'll define minimal interfaces.
@@ -22,6 +24,7 @@ export default function CatalogTabs({
     models: ModelForGrid[],
     collabs: CollabForGrid[]
 }) {
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState<'models' | 'collabs'>('models');
 
 
@@ -54,7 +57,7 @@ export default function CatalogTabs({
                                 cursor: 'pointer', border: 'none'
                             }}
                         >
-                            Modelos <span className="badge-pill" style={{
+                            <ClientText k="nav_models" defaultText="Modelos" /> <span className="badge-pill" style={{
                                 background: activeTab === 'models' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
                                 color: activeTab === 'models' ? 'white' : 'inherit'
                             }}>{models.length}</span>
@@ -71,7 +74,7 @@ export default function CatalogTabs({
                                 cursor: 'pointer', border: 'none'
                             }}
                         >
-                            Collabs <span className="badge-pill" style={{
+                            <ClientText k="nav_collabs" defaultText="Collabs" /> <span className="badge-pill" style={{
                                 background: activeTab === 'collabs' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
                                 color: activeTab === 'collabs' ? 'white' : 'inherit'
                             }}>{collabs.length}</span>
@@ -83,7 +86,7 @@ export default function CatalogTabs({
                             padding: '8px 20px', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8,
                             borderRadius: 999, textDecoration: 'none'
                         }}>
-                            <span>👑</span> Obtener VIP
+                            <span>👑</span> <ClientText k="get_vip" defaultText="Obtener VIP" />
                         </a>
                     </div>
 
@@ -107,7 +110,7 @@ export default function CatalogTabs({
                                     {collabs.length} Colaboraciones
                                 </span>
                                 <span className="text-muted" style={{ fontSize: 13 }}>
-                                    Videos exclusivos multicasting
+                                    <ClientText k="collab_subtitle" defaultText="Videos exclusivos multicasting" />
                                 </span>
                             </div>
                         </div>

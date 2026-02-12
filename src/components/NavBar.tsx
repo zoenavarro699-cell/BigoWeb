@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import LoginModal from '@/components/LoginModal';
 
 export default function NavBar() {
-    const { user, profile, loading, signOut } = useAuth();
-    const [showLogin, setShowLogin] = useState(false);
+    const { user, profile, loading, signOut, openLoginModal } = useAuth();
 
     return (
         <>
@@ -19,7 +17,7 @@ export default function NavBar() {
                 </div>
             </nav>
 
-            <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
+
         </>
     );
 }

@@ -1,5 +1,10 @@
 import "./globals.css";
-import { AuthProvider } from '@/lib/AuthContext';
+import { AuthProvider } from "@/lib/AuthContext";
+import { LanguageProvider } from "@/lib/LanguageContext";
+import GlobalLoginModal from "@/components/GlobalLoginModal";
+import ClientText from "@/components/ClientText";
+import SiteFooter from "@/components/SiteFooter";
+
 
 export const metadata = {
   title: "BIgHot 🔥 - Contenido Exclusivo",
@@ -19,11 +24,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <div className="bg-gradient" />
-        <AuthProvider>
-          <div className="container">
-            {children}
-          </div>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <div className="container">
+              {children}
+              <GlobalLoginModal />
+              <SiteFooter />
+            </div>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

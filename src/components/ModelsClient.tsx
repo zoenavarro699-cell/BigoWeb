@@ -5,6 +5,8 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { sanitizeKeyForTag, makeHashtag } from '@/lib/tag';
 import { useAuth } from '@/lib/AuthContext';
 import { isNameSimilar } from '@/lib/stringUtils';
+import ClientText from './ClientText';
+import { useLanguage } from '@/lib/LanguageContext';
 
 type ModelForGrid = {
   model_key: string;
@@ -46,6 +48,7 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { profile, user } = useAuth(); // Destructure user for simple auth check
+  const { t } = useLanguage();
   const isVerified = profile?.is_verified ?? false;
   const isFemale = profile?.gender_detected === 'female';
 
@@ -142,10 +145,10 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 'fit-content' }}>
           <span className="badge-pill" style={{ background: 'var(--primary-glow)', color: 'white' }}>
-            {total} Modelos
+            {total} <ClientText k="nav_models" defaultText="Modelos" />
           </span>
           <span className="text-muted" style={{ fontSize: 13 }}>
-            Mostrando {current.length}
+            <ClientText k="showing_count" defaultText="Mostrando" /> {current.length}
           </span>
         </div>
 
@@ -153,7 +156,7 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
           <span className="search-icon">🔍</span>
           <input
             className="search-input"
-            placeholder="Buscar modelo..."
+            placeholder={t('search_placeholder')}
             value={query}
             onChange={(e) => handleSearchChange(e.target.value)}
           />
@@ -222,28 +225,17 @@ export default function ModelsClient({ models }: { models: ModelForGrid[] }) {
                     </div>
                   )}
 
-                  {/* Overlay for Guests */}
-                  {!isLoggedIn && (
-                    <div style={{
-                      position: 'absolute', inset: 0,
+                  {/* Optional: Add Lock Icon/Text overlay if restricted */}
+                  {showLock && (
+                    <div className="card-overlay-lock" style={{
+                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      background: 'rgba(0,0,0,0.6)', zIndex: 5, textAlign: 'center', padding: 10
-                    }}>
-                      <span style={{ fontSize: 32, marginBottom: 8 }}>🔒</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: 'white', textTransform: 'uppercase', letterSpacing: 1 }}>
-                        Regístrate para ver
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Overlay for Unverified Logged In */}
-                  {isLoggedIn && !isVerified && (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'rgba(0,0,0,0.3)', pointerEvents: 'none', zIndex: 2
+                      background: 'rgba(0,0,0,0.3)', zIndex: 10
                     }}>
                       <span style={{ fontSize: 24 }}>🔒</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, marginTop: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                        <ClientText k="register_to_view" defaultText="REGÍSTRATE PARA VER" />
+                      </span>
                     </div>
                   )}
 

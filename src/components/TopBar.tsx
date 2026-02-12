@@ -2,24 +2,31 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import LoginModal from '@/components/LoginModal';
-
 import ProfileModal from '@/components/ProfileModal';
+import LanguageSwitch from './LanguageSwitch';
+import ClientText from './ClientText';
 
 export default function TopBar() {
-    const { user, profile, loading } = useAuth();
-    const [showLogin, setShowLogin] = useState(false);
+    const { user, profile, loading, openLoginModal } = useAuth();
     const [showProfile, setShowProfile] = useState(false);
 
     return (
         <>
             <div className="nav glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="brand">
+                <div className="brand" style={{ display: 'flex', alignItems: 'center' }}>
                     <div className="brand-dot" />
-                    <div className="brand-name text-gradient">BIgHot 🔥</div>
+                    <div className="brand-name text-gradient">
+                        <ClientText k="brand_hot" defaultText="Bigo Hot 🔥" />
+                    </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <div style={{ marginLeft: 8 }}>
+                        <LanguageSwitch />
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginLeft: 'auto' }}>
                     {!loading && (
                         <>
                             {user ? (
@@ -36,7 +43,7 @@ export default function TopBar() {
                                     <div style={{ textAlign: 'right', fontSize: 13 }}>
                                         <div style={{ fontWeight: 600, color: 'white' }}>{profile?.username || user.email?.split('@')[0]}</div>
                                         <div style={{ fontSize: 11, color: profile?.is_verified ? '#4ade80' : '#fbbf24' }}>
-                                            {profile?.is_verified ? 'Verificado' : 'Pendiente'}
+                                            {profile?.is_verified ? <ClientText k="verified" defaultText="Verificado" /> : <ClientText k="pending" defaultText="Pendiente" />}
                                         </div>
                                     </div>
                                     <div style={{
@@ -48,7 +55,7 @@ export default function TopBar() {
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => setShowLogin(true)}
+                                    onClick={openLoginModal}
                                     style={{
                                         background: 'linear-gradient(90deg, #f59e0b, #ec4899)',
                                         color: 'white', fontWeight: 600,
@@ -56,14 +63,13 @@ export default function TopBar() {
                                         boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)'
                                     }}
                                 >
-                                    Entrar / Registro
+                                    <ClientText k="login_title" defaultText="Entrar / Registro" />
                                 </button>
                             )}
                         </>
                     )}
                 </div>
             </div>
-            <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
             <ProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />
         </>
     );

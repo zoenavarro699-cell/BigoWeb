@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
+import ClientText from './ClientText';
+import { useLanguage } from '@/lib/LanguageContext';
 
 function ChangePasswordSection({ userEmail }: { userEmail: string | undefined }) {
     const [oldPassword, setOldPassword] = useState('');
@@ -11,10 +13,11 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
     const [msg, setMsg] = useState('');
     const [error, setError] = useState('');
     const [expanded, setExpanded] = useState(false);
+    const { t } = useLanguage();
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newPassword.length < 6) return setError('La nueva contraseña debe tener al menos 6 caracteres');
+        if (newPassword.length < 6) return setError(t('password_min_length'));
 
         setLoading(true);
         setError('');
@@ -36,7 +39,7 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
             const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
             if (updateError) throw updateError;
 
-            setMsg('¡Contraseña actualizada correctamente!');
+            setMsg(t('update_success'));
             setOldPassword('');
             setNewPassword('');
             setTimeout(() => setExpanded(false), 2000);
@@ -51,7 +54,7 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
         return (
             <>
                 <button onClick={() => setExpanded(true)} className="glass-btn-secondary" style={{ width: '100%', marginBottom: 24 }}>
-                    🔒 Cambiar Contraseña
+                    🔒 <ClientText k="change_password" defaultText="Cambiar Contraseña" />
                 </button>
                 <style jsx>{`
                 .glass-btn-secondary {
@@ -78,11 +81,11 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
 
     return (
         <div style={{ background: '#0a0a0a', padding: 20, borderRadius: 12, marginBottom: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
-            <h4 style={{ margin: '0 0 16px', fontSize: 16, textAlign: 'center' }}>Cambiar Contraseña</h4>
+            <h4 style={{ margin: '0 0 16px', fontSize: 16, textAlign: 'center' }}><ClientText k="change_password" defaultText="Cambiar Contraseña" /></h4>
 
             <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                    <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Contraseña Actual</label>
+                    <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}><ClientText k="current_password" defaultText="Contraseña Actual" /></label>
                     <input
                         type="password"
                         value={oldPassword}
@@ -93,7 +96,7 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
                 </div>
 
                 <div>
-                    <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Nueva Contraseña</label>
+                    <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}><ClientText k="new_password" defaultText="Nueva Contraseña" /></label>
                     <input
                         type="password"
                         value={newPassword}
@@ -109,10 +112,10 @@ function ChangePasswordSection({ userEmail }: { userEmail: string | undefined })
 
                 <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
                     <button type="submit" disabled={loading} className="primary-btn" style={{ flex: 1, padding: '10px' }}>
-                        {loading ? '...' : 'Actualizar'}
+                        {loading ? '...' : <ClientText k="update_btn" defaultText="Actualizar" />}
                     </button>
                     <button type="button" onClick={() => setExpanded(false)} className="text-btn" style={{ padding: '0 12px' }}>
-                        Cancelar
+                        <ClientText k="cancel_btn" defaultText="Cancelar" />
                     </button>
                 </div>
             </form>
@@ -182,7 +185,7 @@ export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onC
     const scheduledDate = deletionDate ? new Date(deletionDate.getTime() + 7 * 24 * 60 * 60 * 1000) : null;
 
     const handleRequestDeletion = async () => {
-        if (!confirm('¿Estás seguro? Tu cuenta se eliminará en 1 semana.')) return;
+        if (!confirm(t('delete_account_confirm'))) return;
         setLoading(true);
         try {
             const { error } = await supabase
@@ -227,7 +230,7 @@ export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onC
                         background: profile?.is_verified ? 'rgba(74, 222, 128, 0.1)' : 'rgba(251, 191, 36, 0.1)',
                         color: profile?.is_verified ? '#4ade80' : '#fbbf24', fontSize: 12, border: '1px solid currentColor'
                     }}>
-                        {profile?.is_verified ? 'Verificado' : 'No Verificado'}
+                        {profile?.is_verified ? <ClientText k="verified" defaultText="Verificado" /> : <ClientText k="pending" defaultText="Pendiente" />}
                     </div>
                 </div>
 
@@ -241,14 +244,14 @@ export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onC
 
                 {/* Sign Out */}
                 <button onClick={() => { signOut(); onClose(); }} className="glass-btn-secondary" style={{ width: '100%', marginBottom: 32, color: '#ccc' }}>
-                    Cerrar Sesión
+                    <ClientText k="logout" defaultText="Cerrar Sesión" />
                 </button>
 
                 {/* Deletion Zone (Small & Bottom) */}
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 24, textAlign: 'center' }}>
                     {scheduledDate ? (
                         <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: 12, borderRadius: 8, fontSize: 13 }}>
-                            <p style={{ color: '#fca5a5', margin: '0 0 8px', fontWeight: 600 }}>Eliminación programada: {scheduledDate.toLocaleDateString()}</p>
+                            <p style={{ color: '#fca5a5', margin: '0 0 8px', fontWeight: 600 }}><ClientText k="delete_scheduled" defaultText="Eliminación programada:" /> {scheduledDate.toLocaleDateString()}</p>
                             <button onClick={handleCancelDeletion} disabled={loading} style={{
                                 background: 'white', color: 'black', border: 'none', padding: '4px 12px', borderRadius: 99, cursor: 'pointer', fontSize: 12, fontWeight: 600
                             }}>
@@ -259,7 +262,7 @@ export default function ProfileModal({ isOpen, onClose }: { isOpen: boolean; onC
                         <button onClick={handleRequestDeletion} disabled={loading} style={{
                             background: 'none', border: 'none', color: '#666', fontSize: 12, cursor: 'pointer', textDecoration: 'underline'
                         }}>
-                            Solicitar eliminar mi cuenta
+                            <ClientText k="delete_account_request" defaultText="Solicitar eliminar mi cuenta" />
                         </button>
                     )}
                     {msg && <p style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{msg}</p>}

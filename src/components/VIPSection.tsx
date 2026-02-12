@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import ClientText from './ClientText';
 
 export default function VIPSection() {
     const [showQR, setShowQR] = useState(false);
@@ -23,17 +24,17 @@ export default function VIPSection() {
                             WebkitTextFillColor: 'transparent',
                             marginBottom: 12
                         }}>
-                            Acceso Premium 👑
+                            <ClientText k="vip_title" defaultText="Acceso Premium" /> 👑
                         </h2>
                         <p style={{ fontSize: 16, color: '#999' }}>
-                            Elige el plan que mejor se adapte a ti
+                            <ClientText k="vip_desc" defaultText="Elige el plan que mejor se adapte a ti" />
                         </p>
                     </div>
 
                     {/* Main VIP Card - Featured */}
                     <div className="glass" style={{
                         padding: '40px',
-                        borderRadius: 24,
+                        borderRadius: 32,
                         border: '2px solid rgba(138, 43, 226, 0.3)',
                         background: 'linear-gradient(135deg, rgba(138, 43, 226, 0.08), rgba(255, 20, 147, 0.08))',
                         marginBottom: 32,
@@ -64,7 +65,7 @@ export default function VIPSection() {
                                     marginBottom: 16,
                                     color: 'white'
                                 }}>
-                                    ⭐ MÁS POPULAR
+                                    ⭐ <ClientText k="vip_popular" defaultText="MÁS POPULAR" />
                                 </div>
 
                                 <h3 style={{
@@ -76,11 +77,11 @@ export default function VIPSection() {
                                     alignItems: 'center',
                                     gap: 12
                                 }}>
-                                    🔥 VIP All Access
+                                    <ClientText k="vip_all_access" defaultText="🔥 VIP All Access" />
                                 </h3>
 
                                 <p style={{ fontSize: 15, color: '#bbb', marginBottom: 24, lineHeight: 1.6 }}>
-                                    Acceso ilimitado a todo el contenido del catálogo. Todos los packs, todas las modelos, todas las colaboraciones.
+                                    <ClientText k="vip_all_access_desc" defaultText="Acceso ilimitado a todo el contenido del catálogo..." />
                                 </p>
 
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 24 }}>
@@ -94,7 +95,7 @@ export default function VIPSection() {
                                         3,849
                                     </span>
                                     <span style={{ fontSize: 24, color: '#999' }}>⭐</span>
-                                    <span style={{ fontSize: 14, color: '#666' }}>/ mes</span>
+                                    <span style={{ fontSize: 14, color: '#666' }}><ClientText k="per_month" defaultText="/ mes" /></span>
                                 </div>
 
                                 <a
@@ -106,7 +107,7 @@ export default function VIPSection() {
                                         padding: '14px 40px',
                                         background: 'linear-gradient(135deg, #8a2be2, #ff1493)',
                                         color: 'white',
-                                        borderRadius: 12,
+                                        borderRadius: 999,
                                         fontWeight: 600,
                                         fontSize: 16,
                                         textDecoration: 'none',
@@ -115,7 +116,7 @@ export default function VIPSection() {
                                         border: 'none'
                                     }}
                                 >
-                                    Unirse Ahora →
+                                    <ClientText k="join_now" defaultText="Unirse Ahora" /> →
                                 </a>
                             </div>
 
@@ -130,7 +131,7 @@ export default function VIPSection() {
                                 minWidth: 200
                             }}>
                                 <div style={{ fontSize: 12, color: '#999', marginBottom: 12 }}>
-                                    💳 Métodos Alternativos
+                                    💳 <ClientText k="alt_payment" defaultText="Métodos Alternativos" />
                                 </div>
                                 <div style={{
                                     fontSize: 24,
@@ -185,7 +186,7 @@ export default function VIPSection() {
                                 </div>
 
                                 <div style={{ fontSize: 11, color: '#666' }}>
-                                    Contacta: <a href="https://t.me/ogibVIP" target="_blank" rel="noopener noreferrer" style={{ color: '#ff69b4', fontWeight: 600, textDecoration: 'none' }}>@ogibVIP</a>
+                                    <ClientText k="contact" defaultText="Contacta:" /> <a href="https://t.me/ogibVIP" target="_blank" rel="noopener noreferrer" style={{ color: '#ff69b4', fontWeight: 600, textDecoration: 'none' }}>@ogibVIP</a>
                                 </div>
                             </div>
                         </div>
@@ -208,10 +209,10 @@ export default function VIPSection() {
                                 marginBottom: 10,
                                 color: 'white'
                             }}>
-                                Lives Guardados
+                                <ClientText k="lives_saved" defaultText="Lives Guardados" />
                             </h3>
                             <p style={{ fontSize: 14, color: '#999', marginBottom: 20, lineHeight: 1.5 }}>
-                                Canal con lives y streams grabados
+                                <ClientText k="lives_saved_desc" defaultText="Canal con lives y streams grabados" />
                             </p>
                             <div style={{
                                 fontSize: 32,
@@ -219,9 +220,11 @@ export default function VIPSection() {
                                 color: '#ff1493',
                                 marginBottom: 4
                             }}>
-                                400 ⭐
+                                800 ⭐
                             </div>
-                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>por mes</div>
+                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>
+                                <ClientText k="per_month" defaultText="/ mes" />
+                            </div>
                             <a
                                 href="https://t.me/+eO2vmzh--m0xMGYx"
                                 target="_blank"
@@ -232,13 +235,13 @@ export default function VIPSection() {
                                     background: 'linear-gradient(135deg, #ff1493, #ff69b4)',
                                     color: 'white',
                                     textAlign: 'center',
-                                    borderRadius: 10,
+                                    borderRadius: 999,
                                     fontWeight: 600,
                                     fontSize: 14,
                                     textDecoration: 'none'
                                 }}
                             >
-                                Unirse →
+                                <ClientText k="join" defaultText="Unirse →" />
                             </a>
                         </div>
 
@@ -257,10 +260,10 @@ export default function VIPSection() {
                                 marginBottom: 10,
                                 color: 'white'
                             }}>
-                                Previews de Lives
+                                <ClientText k="previews" defaultText="Previews de Lives" />
                             </h3>
                             <p style={{ fontSize: 14, color: '#999', marginBottom: 20, lineHeight: 1.5 }}>
-                                Adelantos y clips de contenido
+                                <ClientText k="previews_desc" defaultText="Adelantos y clips de contenido" />
                             </p>
                             <div style={{
                                 fontSize: 32,
@@ -268,9 +271,11 @@ export default function VIPSection() {
                                 color: '#00ff7f',
                                 marginBottom: 4
                             }}>
-                                GRATIS
+                                <ClientText k="free_access" defaultText="GRATIS" />
                             </div>
-                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>acceso libre</div>
+                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>
+                                <ClientText k="free_subtitle" defaultText="acceso libre" />
+                            </div>
                             <a
                                 href="https://t.me/RecordingBigoHot"
                                 target="_blank"
@@ -281,13 +286,13 @@ export default function VIPSection() {
                                     background: 'linear-gradient(135deg, #00ff7f, #00cc66)',
                                     color: '#000',
                                     textAlign: 'center',
-                                    borderRadius: 10,
+                                    borderRadius: 999,
                                     fontWeight: 600,
                                     fontSize: 14,
                                     textDecoration: 'none'
                                 }}
                             >
-                                Ver Previews →
+                                <ClientText k="view_previews" defaultText="Ver Previews →" />
                             </a>
                         </div>
                     </div>
@@ -331,7 +336,7 @@ export default function VIPSection() {
                             @ogibVIP - Telegram
                         </p>
                         <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
-                            Escanea para contactar directamente
+                            <ClientText k="scan_contact" defaultText="Escanea para contactar directamente" />
                         </p>
                         <button
                             onClick={() => setShowQR(false)}
@@ -346,7 +351,7 @@ export default function VIPSection() {
                                 fontWeight: 600
                             }}
                         >
-                            Cerrar
+                            <ClientText k="close" defaultText="Cerrar" />
                         </button>
                     </div>
                 </div>
