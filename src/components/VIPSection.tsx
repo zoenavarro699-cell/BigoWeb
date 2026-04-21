@@ -192,108 +192,281 @@ export default function VIPSection() {
                         </div>
                     </div>
 
-                    {/* Two smaller cards side by side */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+                    {/* VIP Paid Channels - 2 cols */}
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#666',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            marginBottom: 16
+                        }}>⭐ Grupos VIP de Pago</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
 
-                        {/* Lives Guardados */}
-                        <div className="glass" style={{
-                            padding: 32,
-                            borderRadius: 20,
-                            border: '2px solid rgba(255, 20, 147, 0.2)',
-                            transition: 'all 0.3s ease'
-                        }}>
-                            <div style={{ fontSize: 40, marginBottom: 12 }}>📹</div>
-                            <h3 style={{
-                                fontSize: 22,
-                                fontWeight: 600,
-                                marginBottom: 10,
-                                color: 'white'
+                            {/* Lives Guardados */}
+                            <div className="glass" style={{
+                                padding: 28,
+                                borderRadius: 20,
+                                border: '2px solid rgba(255, 20, 147, 0.2)',
+                                transition: 'all 0.3s ease'
                             }}>
-                                <ClientText k="lives_saved" defaultText="Lives Guardados" />
-                            </h3>
-                            <p style={{ fontSize: 14, color: '#999', marginBottom: 20, lineHeight: 1.5 }}>
-                                <ClientText k="lives_saved_desc" defaultText="Canal con lives y streams grabados" />
-                            </p>
-                            <div style={{
-                                fontSize: 32,
-                                fontWeight: 700,
-                                color: '#ff1493',
-                                marginBottom: 4
-                            }}>
-                                800 ⭐
-                            </div>
-                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>
-                                <ClientText k="per_month" defaultText="/ mes" />
-                            </div>
-                            <a
-                                href="https://t.me/+eO2vmzh--m0xMGYx"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    display: 'block',
-                                    padding: '10px 24px',
-                                    background: 'linear-gradient(135deg, #ff1493, #ff69b4)',
-                                    color: 'white',
-                                    textAlign: 'center',
-                                    borderRadius: 999,
+                                <div style={{ fontSize: 36, marginBottom: 10 }}>📹</div>
+                                <h3 style={{
+                                    fontSize: 20,
                                     fontWeight: 600,
-                                    fontSize: 14,
-                                    textDecoration: 'none'
-                                }}
-                            >
-                                <ClientText k="join" defaultText="Unirse →" />
-                            </a>
+                                    marginBottom: 8,
+                                    color: 'white'
+                                }}>
+                                    <ClientText k="lives_saved" defaultText="Lives Guardados" />
+                                </h3>
+                                <p style={{ fontSize: 13, color: '#999', marginBottom: 16, lineHeight: 1.5 }}>
+                                    <ClientText k="lives_saved_desc" defaultText="Canal con lives y streams grabados" />
+                                </p>
+                                <div style={{
+                                    fontSize: 28,
+                                    fontWeight: 700,
+                                    color: '#ff1493',
+                                    marginBottom: 4
+                                }}>
+                                    800 ⭐
+                                </div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>
+                                    <ClientText k="per_month" defaultText="/ mes" />
+                                </div>
+                                <a
+                                    href="https://t.me/+Y8HxZR5SA4JhMzc5"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'block',
+                                        padding: '10px 20px',
+                                        background: 'linear-gradient(135deg, #ff1493, #ff69b4)',
+                                        color: 'white',
+                                        textAlign: 'center',
+                                        borderRadius: 999,
+                                        fontWeight: 600,
+                                        fontSize: 14,
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <ClientText k="join" defaultText="Unirse →" />
+                                </a>
+                            </div>
+
+                            {/* Colegialas Reales VIP */}
+                            <div className="glass" style={{
+                                padding: 28,
+                                borderRadius: 20,
+                                border: '2px solid rgba(255, 100, 0, 0.3)',
+                                transition: 'all 0.3s ease',
+                                background: 'rgba(255, 100, 0, 0.03)'
+                            }}>
+                                <div style={{ fontSize: 36, marginBottom: 10 }}>🎓</div>
+                                <h3 style={{
+                                    fontSize: 20,
+                                    fontWeight: 600,
+                                    marginBottom: 8,
+                                    color: 'white'
+                                }}>
+                                    Colegialas Reales VIP
+                                </h3>
+                                <p style={{ fontSize: 13, color: '#999', marginBottom: 16, lineHeight: 1.5 }}>
+                                    Contenido exclusivo del grupo privado
+                                </p>
+                                <div style={{
+                                    fontSize: 28,
+                                    fontWeight: 700,
+                                    color: '#ff6400',
+                                    marginBottom: 4
+                                }}>
+                                    800 ⭐
+                                </div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>
+                                    <ClientText k="per_month" defaultText="/ mes" />
+                                </div>
+                                <a
+                                    href="https://t.me/+7-g7qGC24CxkYjkx"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'block',
+                                        padding: '10px 20px',
+                                        background: 'linear-gradient(135deg, #ff6400, #ff9900)',
+                                        color: 'white',
+                                        textAlign: 'center',
+                                        borderRadius: 999,
+                                        fontWeight: 600,
+                                        fontSize: 14,
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <ClientText k="join" defaultText="Unirse →" />
+                                </a>
+                            </div>
+
+                            {/* PiperBlus VIP */}
+                            <div className="glass" style={{
+                                padding: 28,
+                                borderRadius: 20,
+                                border: '2px solid rgba(100, 120, 255, 0.3)',
+                                transition: 'all 0.3s ease',
+                                background: 'rgba(100, 120, 255, 0.03)'
+                            }}>
+                                <div style={{ fontSize: 36, marginBottom: 10 }}>💎</div>
+                                <h3 style={{
+                                    fontSize: 20,
+                                    fontWeight: 600,
+                                    marginBottom: 8,
+                                    color: 'white'
+                                }}>
+                                    PiperBlus VIP
+                                </h3>
+                                <p style={{ fontSize: 13, color: '#999', marginBottom: 16, lineHeight: 1.5 }}>
+                                    Contenido exclusivo del grupo privado
+                                </p>
+                                <div style={{
+                                    fontSize: 28,
+                                    fontWeight: 700,
+                                    color: '#6478ff',
+                                    marginBottom: 4
+                                }}>
+                                    800 ⭐
+                                </div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>
+                                    <ClientText k="per_month" defaultText="/ mes" />
+                                </div>
+                                <a
+                                    href="https://t.me/+7waFVXQHUBFjZjlh"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'block',
+                                        padding: '10px 20px',
+                                        background: 'linear-gradient(135deg, #6478ff, #a855f7)',
+                                        color: 'white',
+                                        textAlign: 'center',
+                                        borderRadius: 999,
+                                        fontWeight: 600,
+                                        fontSize: 14,
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <ClientText k="join" defaultText="Unirse →" />
+                                </a>
+                            </div>
                         </div>
+                    </div>
 
-                        {/* Previews GRATIS */}
-                        <div className="glass" style={{
-                            padding: 32,
-                            borderRadius: 20,
-                            border: '2px solid rgba(0, 255, 127, 0.3)',
-                            transition: 'all 0.3s ease',
-                            background: 'rgba(0, 255, 127, 0.03)'
-                        }}>
-                            <div style={{ fontSize: 40, marginBottom: 12 }}>🎬</div>
-                            <h3 style={{
-                                fontSize: 22,
-                                fontWeight: 600,
-                                marginBottom: 10,
-                                color: 'white'
+                    {/* Free / Info Channels - 3 cols */}
+                    <div style={{ marginTop: 12 }}>
+                        <div style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#666',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            marginBottom: 16
+                        }}>🆓 Canales Gratuitos</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+
+                            {/* BigHot Global */}
+                            <div className="glass" style={{
+                                padding: 24,
+                                borderRadius: 20,
+                                border: '2px solid rgba(0, 255, 127, 0.3)',
+                                transition: 'all 0.3s ease',
+                                background: 'rgba(0, 255, 127, 0.03)'
                             }}>
-                                <ClientText k="previews" defaultText="Previews de Lives" />
-                            </h3>
-                            <p style={{ fontSize: 14, color: '#999', marginBottom: 20, lineHeight: 1.5 }}>
-                                <ClientText k="previews_desc" defaultText="Adelantos y clips de contenido" />
-                            </p>
-                            <div style={{
-                                fontSize: 32,
-                                fontWeight: 700,
-                                color: '#00ff7f',
-                                marginBottom: 4
-                            }}>
-                                <ClientText k="free_access" defaultText="GRATIS" />
-                            </div>
-                            <div style={{ fontSize: 13, color: '#666', marginBottom: 20 }}>
-                                <ClientText k="free_subtitle" defaultText="acceso libre" />
-                            </div>
-                            <a
-                                href="https://t.me/RecordingBigoHot"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    display: 'block',
-                                    padding: '10px 24px',
-                                    background: 'linear-gradient(135deg, #00ff7f, #00cc66)',
-                                    color: '#000',
-                                    textAlign: 'center',
-                                    borderRadius: 999,
+                                <div style={{ fontSize: 32, marginBottom: 8 }}>🔥</div>
+                                <h3 style={{
+                                    fontSize: 18,
                                     fontWeight: 600,
-                                    fontSize: 14,
-                                    textDecoration: 'none'
-                                }}
-                            >
-                                <ClientText k="view_previews" defaultText="Ver Previews →" />
-                            </a>
+                                    marginBottom: 8,
+                                    color: 'white'
+                                }}>
+                                    BigHot Global
+                                </h3>
+                                <p style={{ fontSize: 13, color: '#999', marginBottom: 16, lineHeight: 1.5 }}>
+                                    Grupo público de previews y contenido
+                                </p>
+                                <div style={{
+                                    fontSize: 22,
+                                    fontWeight: 700,
+                                    color: '#00ff7f',
+                                    marginBottom: 4
+                                }}>
+                                    GRATIS
+                                </div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>acceso libre</div>
+                                <a
+                                    href="https://t.me/BigHot_Global"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'block',
+                                        padding: '9px 20px',
+                                        background: 'linear-gradient(135deg, #00ff7f, #00cc66)',
+                                        color: '#000',
+                                        textAlign: 'center',
+                                        borderRadius: 999,
+                                        fontWeight: 600,
+                                        fontSize: 13,
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    Unirse Gratis →
+                                </a>
+                            </div>
+
+                            {/* Canal de Respaldo - BIGHOTANUNCIOS */}
+                            <div className="glass" style={{
+                                padding: 24,
+                                borderRadius: 20,
+                                border: '2px solid rgba(255, 200, 0, 0.3)',
+                                transition: 'all 0.3s ease',
+                                background: 'rgba(255, 200, 0, 0.03)'
+                            }}>
+                                <div style={{ fontSize: 32, marginBottom: 8 }}>📢</div>
+                                <h3 style={{
+                                    fontSize: 18,
+                                    fontWeight: 600,
+                                    marginBottom: 8,
+                                    color: 'white'
+                                }}>
+                                    Canal de Respaldo
+                                </h3>
+                                <p style={{ fontSize: 13, color: '#999', marginBottom: 16, lineHeight: 1.5 }}>
+                                    Si nuestros grupos son eliminados, aquí publicamos los nuevos links
+                                </p>
+                                <div style={{
+                                    fontSize: 22,
+                                    fontWeight: 700,
+                                    color: '#ffc800',
+                                    marginBottom: 4
+                                }}>
+                                    GRATIS
+                                </div>
+                                <div style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>¡Síguenos!</div>
+                                <a
+                                    href="https://t.me/BIGHOTANUNCIOS"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        display: 'block',
+                                        padding: '9px 20px',
+                                        background: 'linear-gradient(135deg, #ffc800, #ff9900)',
+                                        color: '#000',
+                                        textAlign: 'center',
+                                        borderRadius: 999,
+                                        fontWeight: 600,
+                                        fontSize: 13,
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    Seguir Canal →
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -54,26 +54,25 @@ export async function listBatchesForModel(modelId: string): Promise<BatchRow[]> 
 
   // 2. Get Thumbnails manually (avoids missing FK issues)
   const batchIds = batches.map(b => b.id);
-  const { data: assetsData } = await supabaseAdmin
-    .from("assets")
-    .select("batch_id, thumb_url")
-    .in("batch_id", batchIds)
-    .eq("published", true)
-    .not("thumb_url", "is", null)
-    .limit(1000); // Sanity limit
+  const [assetsRes, partsRes] = await Promise.all([
+    supabaseAdmin.from("assets").select("batch_id, thumb_url").in("batch_id", batchIds).eq("published", true).not("thumb_url", "is", null).limit(1000),
+    supabaseAdmin.from("asset_parts").select("batch_id, thumb_url").in("batch_id", batchIds).eq("published", true).not("thumb_url", "is", null).limit(1000)
+  ]);
 
   // 3. Group thumbnails by batch
   const thumbMap: Record<string, string[]> = {};
-  if (assetsData) {
-    for (const a of assetsData) {
+  const processGroup = (data: any[] | null) => {
+    if (!data) return;
+    for (const a of data) {
       if (!a.batch_id || !a.thumb_url) continue;
       if (!thumbMap[a.batch_id]) thumbMap[a.batch_id] = [];
-      // Limit to 4 per batch
       if (thumbMap[a.batch_id].length < 4) {
         thumbMap[a.batch_id].push(a.thumb_url);
       }
     }
-  }
+  };
+  processGroup(assetsRes.data);
+  processGroup(partsRes.data);
 
   // 4. Attach
   return batches.map(b => ({
@@ -186,25 +185,25 @@ export async function listBatchesForCollab(collabId: string): Promise<CollabBatc
 
   // 2. Get Thumbnails manually
   const batchIds = batches.map(b => b.id);
-  const { data: assetsData } = await supabaseAdmin
-    .from("collab_assets")
-    .select("batch_id, thumb_url")
-    .in("batch_id", batchIds)
-    .eq("published", true)
-    .not("thumb_url", "is", null)
-    .limit(1000);
+  const [assetsRes, partsRes] = await Promise.all([
+    supabaseAdmin.from("collab_assets").select("batch_id, thumb_url").in("batch_id", batchIds).eq("published", true).not("thumb_url", "is", null).limit(1000),
+    supabaseAdmin.from("collab_asset_parts").select("batch_id, thumb_url").in("batch_id", batchIds).eq("published", true).not("thumb_url", "is", null).limit(1000)
+  ]);
 
   // 3. Group
   const thumbMap: Record<string, string[]> = {};
-  if (assetsData) {
-    for (const a of assetsData) {
+  const processGroup = (data: any[] | null) => {
+    if (!data) return;
+    for (const a of data) {
       if (!a.batch_id || !a.thumb_url) continue;
       if (!thumbMap[a.batch_id]) thumbMap[a.batch_id] = [];
       if (thumbMap[a.batch_id].length < 4) {
         thumbMap[a.batch_id].push(a.thumb_url);
       }
     }
-  }
+  };
+  processGroup(assetsRes.data);
+  processGroup(partsRes.data);
 
   // 4. Attach
   return batches.map(b => ({

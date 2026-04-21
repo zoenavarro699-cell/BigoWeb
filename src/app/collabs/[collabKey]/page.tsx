@@ -10,8 +10,9 @@ function Stars({ n }: { n: number | null }) {
   return <span className="pill">⭐ {v}</span>;
 }
 
-export default async function CollabPage({ params }: { params: { collabKey: string } }) {
-  const collabKey = decodeURIComponent(params.collabKey);
+export default async function CollabPage({ params }: { params: Promise<{ collabKey: string }> }) {
+  const { collabKey: rawKey } = await params;
+  const collabKey = decodeURIComponent(rawKey);
   const collab = await getCollabByKey(collabKey);
 
   if (!collab) {
