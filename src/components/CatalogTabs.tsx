@@ -116,13 +116,16 @@ export default function CatalogTabs({
                         </div>
 
                         <div className="grid">
-                            {collabs.map((c) => (
+                            {collabs.map((c) => {
+                                const fallbackCover = c.collaborator_profiles?.find((p: any) => p.cover_url)?.cover_url ?? null;
+                                const displayCover = c.cover_url || fallbackCover;
+                                return (
                                 <a key={c.collab_key} className="card glass" href={`/collabs/${encodeURIComponent(c.collab_key)}`}>
                                     <div className="card-image-wrap">
-                                        {c.cover_url ? (
+                                        {displayCover ? (
                                             <Image
                                                 className="card-image"
-                                                src={c.cover_url}
+                                                src={displayCover}
                                                 alt={c.collab_key}
                                                 fill
                                                 sizes="(max-width: 768px) 50vw, 25vw"
@@ -131,9 +134,9 @@ export default function CatalogTabs({
                                             <div style={{
                                                 width: '100%', height: '100%',
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                background: '#1a1a20', color: 'var(--text-dim)'
+                                                background: '#1a1a20', fontSize: 48
                                             }}>
-                                                No Preview
+                                                🎬
                                             </div>
                                         )}
 
@@ -184,7 +187,8 @@ export default function CatalogTabs({
                                         </div>
                                     </div>
                                 </a>
-                            ))}
+                                );
+                            })}
                         </div>
                     </section>
                 )}
